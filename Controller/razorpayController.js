@@ -9,7 +9,6 @@ const moment = require('moment');
 const razorpayKeyId = 'rzp_test_RP9jKB0e45QR7x'
 const razorpayKeySecret = 'tJ3FfCssvJOJfHejrzBXiK5H'
 
-console.log(razorpayKeyId,'the id ')
 exports.order = asyncHandler(async(req,res) => {
  try {
     const razorpay = new Razorpay({

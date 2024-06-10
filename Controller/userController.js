@@ -342,3 +342,30 @@ exports.getrevealedUser = asyncHandler(async(req,res)=>{
         console.log(err)
     }
 })
+
+
+exports.changepassword = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+   
+    const {oldPassword , newPassword, cPassword} = req.body;
+
+    try {
+        const changePasswrod = await userModel.findById(id)
+        const passwordMatch = await bcrypt.compare(oldPassword, changePasswrod.password)
+       
+       
+        if(!passwordMatch){
+            res.status(403).json({message:"The current password is not exist"})
+        }else if(newPassword === cPassword){
+
+            changePasswrod.password = cPassword;
+            const updateUser = await changePasswrod.save();
+            res.status(200).json({message:'password has been changed',updateUser});
+
+        }else{
+            res.status(400).json({message:'Confirm password is incorrect'})
+        }
+    }catch(err){
+        console.log(err)
+    }
+})

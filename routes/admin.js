@@ -78,6 +78,7 @@ router.put('/revealuser/:id',verifyToken,userController.revealUser)
 router.get('/getrevealedusers',verifyToken,userController.getrevealedUser)
 router.put('/unreveal/:id',verifyToken,userController.unrevealUser)
 router.post('/onlineuser',upload.single('image'),userController.onlineUser)
+router.put('/changepassword/:id',userController.changepassword);
 // plan orders ----------------
 
 router.post('/createplanorder',verifyToken,planOrderController.postPlandOrder)
