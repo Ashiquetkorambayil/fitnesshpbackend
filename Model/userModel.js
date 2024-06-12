@@ -10,6 +10,8 @@ const userModel = new mongoose.Schema({
     dateOfBirth:{type:String, required:true},
     blood:{type:String, required:true},
     email:{type:String, required:true},
+    idProof:{type:String, required: true},
+    address:{type:String, required:true},
     plan:{type:String},
     token:{type: String},
     revealed:{type:Boolean, default:false},

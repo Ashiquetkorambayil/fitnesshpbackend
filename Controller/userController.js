@@ -7,12 +7,13 @@ const moment = require('moment');
 
 
 exports.onlineUser = asyncHandler(async (req, res) => {
-    const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration} = req.body; 
-    const image = req.file ? req.file.filename : undefined;
+    const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration, address} = req.body; 
+    const image = req.files['image'] ? req.files['image'][0].filename : undefined;
+    const idProof = req.files['idproof'] ? req.files['idproof'][0].filename : undefined;
     
     try {
         // Validate inputs
-        if (!name || !phone || !password || !height || !weight || !dateOfBirth || !blood || !email) {
+        if (!name || !phone || !password || !height || !weight || !dateOfBirth || !blood || !email || !idProof || !address) {
             return res.status(400).json({ message: "All fields are required" });
         }
         
@@ -21,11 +22,15 @@ exports.onlineUser = asyncHandler(async (req, res) => {
         if (existingUser) {
             return res.status(409).json({ message: "Phone number already exists" });
         }
-        const expiryDate = moment().add(duration, 'months').toDate();
+        // const expiryDate = moment().add(duration, 'months').toDate();
+        const expiryDate = moment().add(duration, 'days').toDate();
+
         
         // Create the user
         const newUser = await userModel.create({
             image,
+            idProof,
+            address,
             name,
             phone,
             password,
@@ -60,12 +65,16 @@ exports.onlineUser = asyncHandler(async (req, res) => {
 
 
 exports.postUser = asyncHandler(async (req, res) => {
-    const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration} = req.body; 
-    const image = req.file ? req.file.filename : undefined;
+    const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration, address} = req.body; 
+    const image = req.files['image'] ? req.files['image'][0].filename : undefined;
+    const idProof = req.files['idproof'] ? req.files['idproof'][0].filename : undefined;
+
+  
+    console.log(image, idProof, 'this is the image and the idProof')
     
     try {
         // Validate inputs
-        if (!name || !phone || !password || !height || !weight || !dateOfBirth || !blood || !email) {
+        if (!name || !phone || !password || !height || !weight || !dateOfBirth || !blood || !email || !idProof || !address) {
             return res.status(400).json({ message: "All fields are required" });
         }
         
@@ -74,7 +83,9 @@ exports.postUser = asyncHandler(async (req, res) => {
         if (existingUser) {
             return res.status(409).json({ message: "Phone number already exists" });
         }
-        const expiryDate = moment().add(duration, 'months').toDate();
+        // const expiryDate = moment().add(duration, 'months').toDate();
+        const expiryDate = moment().add(duration, 'days').toDate();
+
         
         // Create the user
         const newUser = await userModel.create({
@@ -87,6 +98,8 @@ exports.postUser = asyncHandler(async (req, res) => {
             dateOfBirth,
             blood,
             email,
+            idProof,
+            address,
             authenticate: true,
         });
         const newPlanOrder = await plandOrderModel.create({
@@ -136,7 +149,9 @@ exports.createUser = asyncHandler(async (req, res) => {
         if (existingUser) {
             return res.status(409).json({ message: "Phone number already exists" });
         }
-        const expiryDate = moment().add(duration, 'months').toDate();
+        // const expiryDate = moment().add(duration, 'months').toDate();
+        const expiryDate = moment().add(duration, 'days').toDate();
+
         
         // Create the user
         const newUser = await userModel.create({
@@ -233,6 +248,8 @@ exports.userPostSignIn = asyncHandler(async(req, res) => {
             duration: postSignin.duration,
             expiryDate: postSignin.expiryDate,
             activeStatus: postSignin.activeStatus,
+            idProof:postSignin.idProof,
+            address:postSignin.address
         };
         console.log(postSignin.image, " the image is ")
 
@@ -277,11 +294,14 @@ exports.getUserById = asyncHandler(async(req,res)=>{
 
 exports.editUser = asyncHandler(async(req, res)=>{
     const {id} = req.params;
-    const {name, phone, height, weight, dateOfBirth, blood, email} = req.body;
-    const image = req.file ? req.file.filename : undefined;
+    const {name, phone, height, weight, dateOfBirth, blood, email, address} = req.body;
+    const image = req.files['image'] ? req.files['image'][0].filename : undefined;
+    const idProof = req.files['idproof'] ? req.files['idproof'][0].filename : undefined;
     try{  
         const update = {
             image:image, 
+            address:address,
+            idProof:idProof,
             name:name,
             phone:phone,
             height:height,

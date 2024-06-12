@@ -55,7 +55,9 @@ exports.validate = asyncHandler(async(req,res)=>{
         });
         return res.status(400).json({msg: " Transaction is not legit!"});
     }
-    const expiryDate = moment().add(duration, 'months').toDate();// Assuming you set the expiry date here
+    // const expiryDate = moment().add(duration, 'months').toDate();// Assuming you set the expiry date here
+    const expiryDate = moment().add(duration, 'days').toDate();
+
     
     await planOrderModel.create({ 
         userId, 

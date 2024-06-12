@@ -16,7 +16,7 @@ exports.postPlandOrder = asyncHandler(async(req,res)=>{
     console.log(req.body), 'the rusult'
     try{
         // Calculate expiry date by adding duration months to the current date
-        const expiryDate = moment().add(duration, 'months').toDate();
+        const expiryDate = moment().add(duration, 'days').toDate();
         
         // Create plan order with expiry date
         await plandOrderModel.create({ userId, planId, name, amount, duration, expiryDate ,modeOfPayment, userName, activeStatus:'Active',showUser:true});
@@ -184,8 +184,8 @@ exports.postPendingOrder = asyncHandler(async(req,res)=>{
     const { userId, planId, name, amount, duration, userName, modeOfPayment } = req.body;
     try{
         // Calculate expiry date by adding duration months to the current date
-        const expiryDate = moment().add(duration, 'months').toDate();
-        
+        const expiryDate = moment().add(duration, 'days').toDate();
+        console.log(expiryDate,'this is the expiry date')
         // Create plan order with expiry date and activeStatus set to "Pending"
         await plandOrderModel.create({ 
             userId, 

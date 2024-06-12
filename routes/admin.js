@@ -66,18 +66,18 @@ router.get('/getenrollmentbyid/:id',enrollmetnController.getEnrollmentById)
 router.put('/putenrollment/:id',enrollmetnController.putEnrollment)
 
 // users-----------------
-router.post('/postuser',upload.single('image'),userController.postUser)
+router.post('/postuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.postUser)
 router.post('/createuser',upload.single('image'),userController.createUser)
 router.post('/postusersignin',userController.userPostSignIn)
 router.get('/getusers',verifyToken,userController.getUser)
 // router.get('/getsearchusers',verifyToken,userController.getSearchUsers)
 router.get('/getuserbyid/:id',userController.getUserById)
 router.delete('/deleteuser/:id',userController.deleteUser)
-router.put('/edituser/:id',upload.single('image'),userController.editUser)
+router.put('/edituser/:id',upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.editUser)
 router.put('/revealuser/:id',verifyToken,userController.revealUser)
 router.get('/getrevealedusers',verifyToken,userController.getrevealedUser)
 router.put('/unreveal/:id',verifyToken,userController.unrevealUser)
-router.post('/onlineuser',upload.single('image'),userController.onlineUser)
+router.post('/onlineuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.onlineUser)
 router.put('/changepassword/:id',userController.changepassword);
 // plan orders ----------------
 
