@@ -2,12 +2,12 @@ const planModel = require('../Model/planModel');
 const asyncHandler = require('express-async-handler');
 
 exports.postPlan = asyncHandler(async(req, res)=>{
-    const {name, amount, duration, description} = req.body
+    const {hour, amount, duration, description} = req.body
     console.log(req.body,"the dataaaaaaaaaaaaaa")
     
     try{
         await planModel.create({
-            name:name,
+            hour:hour,
             amount:amount,
             duration:duration,
             description:description
@@ -43,14 +43,14 @@ exports.getPlansById = asyncHandler(async(req,res)=>{
 
 exports.putPlans = asyncHandler(async(req, res)=>{
     const {id} = req.params;
-    const {name, amount, duration, description} = req.body;
+    const {hour, amount, duration, description} = req.body;
    
    
 
     try{
     
         const update = {
-           name:name,
+           hour:hour,
            amount:amount,
            duration:duration,
            description:description

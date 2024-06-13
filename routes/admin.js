@@ -40,6 +40,8 @@ const pendingOrdersController = require('../Controller/pendingOrderController')
 const paytmController = require('../Controller/paytmController')
 const paytmCheckoutController = require('../Controller/paytmCheckoutController')
 const razorpayController = require('../Controller/razorpayController')
+const optionsController = require('../Controller/optionsController');
+const { route } = require('.');
 
 
 // admin -----------------------------
@@ -94,7 +96,13 @@ router.put('/updatetoactive/:id',verifyToken,planOrderController.updateOrderToAc
 router.put('/updatetoreject/:id',verifyToken,planOrderController.updateOrderToRejected)
 router.get('/getallstatus',verifyToken,planOrderController.getAllStatus)
 router.get('/getactiveusers',verifyToken,planOrderController.getActiveStatus)
-// pending orders ----------------
+
+// options ----------------
+router.post('/postoptions',verifyToken,optionsController.postOptions);
+router.get('/getoptions',optionsController.getOptions);
+router.get('/getoptionsbyid/:id',optionsController.getOptionsById);
+router.put('/updateoptions/:id',optionsController.editOptions);
+router.delete('/deleteoptions/:id',optionsController.deleteOptionsByid);
 
 
 router.post('/handlePayNow',paytmController.initiateTransaction);
