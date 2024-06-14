@@ -57,6 +57,7 @@ router.put('/updateadminbyid/:id',upload.single('image'),verifyToken,adminContro
 router.post('/postPlan',verifyToken,planController.postPlan)
 router.get('/getplans',planController.getPlans)
 router.get('/getplansbyid/:id',verifyToken,planController.getPlansById)
+router.get('/getplansbyoptiosid/:id',verifyToken,planController.getPlansByOptions)
 router.put('/putplans/:id',verifyToken,planController.putPlans)
 router.delete('/deleteplan/:id',verifyToken,planController.deletePlansById)
 

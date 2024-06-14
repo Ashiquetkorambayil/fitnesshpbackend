@@ -40,6 +40,18 @@ exports.getPlansById = asyncHandler(async(req,res)=>{
     }
 })
 
+exports.getPlansByOptions = asyncHandler(async(req,res)=>{
+    const {id} = req.params
+    console.log(req.params,'teh id')
+    try{
+        const response = await planModel.find({description : id})
+        res.status(200).json(response)
+    }catch(err){
+        console.log(err)
+        res.status(500).send('An error occured while fetching data')
+    }
+})
+
 
 exports.putPlans = asyncHandler(async(req, res)=>{
     const {id} = req.params;
