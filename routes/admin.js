@@ -41,6 +41,7 @@ const paytmController = require('../Controller/paytmController')
 const paytmCheckoutController = require('../Controller/paytmCheckoutController')
 const razorpayController = require('../Controller/razorpayController')
 const optionsController = require('../Controller/optionsController');
+const campaignController = require('../Controller/campaignController')
 const { route } = require('.');
 
 
@@ -100,11 +101,15 @@ router.get('/getactiveusers',verifyToken,planOrderController.getActiveStatus)
 
 // options ----------------
 router.post('/postoptions',verifyToken,optionsController.postOptions);
-router.get('/getoptions',optionsController.getOptions);
-router.get('/getoptionsbyid/:id',optionsController.getOptionsById);
-router.put('/updateoptions/:id',optionsController.editOptions);
-router.delete('/deleteoptions/:id',optionsController.deleteOptionsByid);
+router.get('/getoptions',verifyToken,optionsController.getOptions);
+router.get('/getoptionsbyid/:id',verifyToken,optionsController.getOptionsById);
+router.put('/updateoptions/:id',verifyToken,optionsController.editOptions);
+router.delete('/deleteoptions/:id',verifyToken,optionsController.deleteOptionsByid);
 
+// campaign--------------------
+router.post('/createcampaign',verifyToken,campaignController.createCampaign)
+router.get('/getcampaign',verifyToken,campaignController.getCampaign)
+router.delete('/deletecampaign/:id',verifyToken,campaignController.deleteCampaign)
 
 router.post('/handlePayNow',paytmController.initiateTransaction);
 router.post('/paynow',paytmCheckoutController.paytmPayment)

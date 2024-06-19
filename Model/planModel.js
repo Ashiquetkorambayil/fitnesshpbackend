@@ -7,7 +7,8 @@ const planModel = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'optionsData',
         required: true,
-    }
+    },
+    amountBeforeDiscount: { type: Number }
 })
 
 const planData = mongoose.model("planData", planModel)
