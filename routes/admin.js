@@ -109,7 +109,10 @@ router.delete('/deleteoptions/:id',verifyToken,optionsController.deleteOptionsBy
 // campaign--------------------
 router.post('/createcampaign',verifyToken,campaignController.createCampaign)
 router.get('/getcampaign',verifyToken,campaignController.getCampaign)
+router.get('/getcampaignbyid/:id',verifyToken,campaignController.getCampaignzById)
 router.delete('/deletecampaign/:id',verifyToken,campaignController.deleteCampaign)
+router.delete('/deleteexpired',verifyToken,campaignController.deleteExpiredCampaigns)
+router.put('/updatecampaign/:id',verifyToken,campaignController.updateCampaign)
 
 router.post('/handlePayNow',paytmController.initiateTransaction);
 router.post('/paynow',paytmCheckoutController.paytmPayment)
