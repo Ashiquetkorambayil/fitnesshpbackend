@@ -83,6 +83,7 @@ router.get('/getrevealedusers',verifyToken,userController.getrevealedUser)
 router.put('/unreveal/:id',verifyToken,userController.unrevealUser)
 router.post('/onlineuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.onlineUser)
 router.put('/changepassword/:id',userController.changepassword);
+router.get('/getuserbyphone/:phone',verifyToken,userController.getUserByPhone);
 // plan orders ----------------
 
 router.post('/createplanorder',verifyToken,planOrderController.postPlandOrder)
@@ -94,10 +95,17 @@ router.delete('/deleteplanorder/:id',verifyToken,planOrderController.deletePlanO
 
 router.post('/creatependingorder',verifyToken,planOrderController.postPendingOrder)
 router.get('/getpendingorder',verifyToken,planOrderController.getPendingPlanOrders)
+router.get('/getpendingbuddyorders',verifyToken,planOrderController.getBuddyPending)
 router.put('/updatetoactive/:id',verifyToken,planOrderController.updateOrderToActive)
+router.put('/updatebuddyplan/:id',verifyToken,planOrderController.updateBuddyPlan)
 router.put('/updatetoreject/:id',verifyToken,planOrderController.updateOrderToRejected)
+router.put('/buddytoactivate/:id',verifyToken,planOrderController.buddyToActiveBuddy)
 router.get('/getallstatus',verifyToken,planOrderController.getAllStatus)
 router.get('/getactiveusers',verifyToken,planOrderController.getActiveStatus)
+
+
+router.post('/createbuddyplan',verifyToken,planOrderController.createBuddyPlan)
+router.post('/spreadplan',verifyToken,planOrderController.spreadPlanForBuddy)
 
 // options ----------------
 router.post('/postoptions',verifyToken,optionsController.postOptions);

@@ -10,8 +10,12 @@ const planOrderModel = new mongoose.Schema({
     selectedAt: { type: Date, default: Date.now },
     expiryDate: { type: Date },
     activeStatus: { type: String, enum: ["Active", "Expired", "Nearly Expire","Pending", "Rejected"]},
+    buddyPlanMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'userData' }],
+    activedBuddyPlanMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'userData' }],
     show:{type:Boolean, default: true},
-    showUser:{type:Boolean, default:false}
+    showUser:{type:Boolean, default:false},
+    buddyPlan:{type:Boolean, default:false},
+    admin:{ type: mongoose.Schema.Types.ObjectId, ref: 'userData'}
 });
 
 const plandOrderData = mongoose.model("plandOrderData", planOrderModel)

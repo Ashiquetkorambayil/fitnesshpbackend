@@ -389,3 +389,24 @@ exports.changepassword = asyncHandler(async(req, res)=>{
         console.log(err)
     }
 })
+
+exports.getUserByPhone = asyncHandler(async (req, res) => {
+    const { phone } = req.params;
+
+    try {
+        // Find the user based on phone number
+        const user = await userModel.findOne({ phone });
+
+        // If user not found, return 404 with an error message
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // If user found, return the user data
+        res.status(200).json(user);
+    } catch (err) {
+        // Log and handle errors
+        console.error("Error fetching user by phone:", err);
+        res.status(500).json({ message: 'An error occurred while fetching user' });
+    }
+});

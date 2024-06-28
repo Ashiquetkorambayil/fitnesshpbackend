@@ -31,6 +31,19 @@ exports.postPlandOrder = asyncHandler(async(req,res)=>{
     }
 });
 
+exports.spreadPlanForBuddy = asyncHandler(async(req,res)=>{
+    const { userId, expiryDate ,amount, duration, userName, modeOfPayment, admin } = req.body;
+    try {
+        await plandOrderModel.create({ userId, amount, duration, expiryDate ,modeOfPayment, userName, activeStatus:'Active',showUser:true, admin});
+        const user = await userModel.findById(userId);
+        user.authenticate = true
+        res.json({ message: 'User plan selected successfully' });
+        await user.save();
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
 
 exports.getPlanOrderByUser = asyncHandler(async (req, res) => {
     const { id: userId } = req.params;
@@ -188,7 +201,7 @@ exports.postPendingOrder = asyncHandler(async(req,res)=>{
         console.log(expiryDate,'this is the expiry date')
         // Create plan order with expiry date and activeStatus set to "Pending"
         await plandOrderModel.create({ 
-            userId, 
+            userId,
             planId, 
             userName,
             name, 
@@ -206,17 +219,37 @@ exports.postPendingOrder = asyncHandler(async(req,res)=>{
     }
 });
 
-exports.getPendingPlanOrders = asyncHandler(async(req,res)=>{
-    try{
-        // Find plan orders where activeStatus is "Pending"
-        const pendingPlanOrders = await plandOrderModel.find({ activeStatus: "Pending" });
+exports.getPendingPlanOrders = asyncHandler(async (req, res) => {
+    try {
+        // Find plan orders where activeStatus is "Pending" and buddyPlan is false
+        const pendingPlanOrders = await plandOrderModel.find({ 
+            activeStatus: "Pending",
+            buddyPlan: false
+        });
         
         res.json(pendingPlanOrders);
-    } catch(err){
+        console.log(pendingPlanOrders,'this is th pendsing plan')
+    } catch (err) {
         console.log(err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+exports.getBuddyPending = asyncHandler(async (req, res) => {
+    try {
+        // Find plan orders where activeStatus is "Pending" and buddyPlan is false
+        const pendingPlanOrders = await plandOrderModel.find({ 
+            activeStatus: "Pending",
+            buddyPlan: true
+        });
+        
+        res.json(pendingPlanOrders);
+        console.log(pendingPlanOrders,'this is th pendsing plan')
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 
 exports.updateOrderToActive = asyncHandler(async(req,res)=>{
@@ -343,5 +376,86 @@ exports.getActiveStatus = asyncHandler(async (req, res) => {
     } catch (error) {
         console.error('Error fetching last plan orders of all users:', error);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+exports.createBuddyPlan = asyncHandler(async(req,res)=>{
+    const {userId, userName, modeOfPayment, buddyPlanMembers, planId, amount, duration} = req.body
+    const expiryDate = moment().add(duration, 'days').toDate();
+    try {
+        await plandOrderModel.create({
+            userId:userId,
+            userName:userName,
+            modeOfPayment:modeOfPayment,
+            activeStatus:"Pending",
+            buddyPlanMembers:buddyPlanMembers,
+            buddyPlan:true,
+            planId:planId,
+            amount:amount,
+            duration:duration,
+            expiryDate:expiryDate
+        })
+        res.status(200).send('Buddy plan created successfully')
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('An error occured while creating the buddy plan')
+    }
+})
+
+exports.updateBuddyPlan = asyncHandler(async (req, res) => {
+    const { amount } = req.body;
+    const { id } = req.params;
+
+    try {
+        // Find the existing plan order by its ID
+        const existingPlanOrder = await plandOrderModel.findById(id);
+
+        if (existingPlanOrder) {
+            // Update the existing plan order with the new amount and set status to Active
+            existingPlanOrder.amount = amount;
+            existingPlanOrder.activeStatus = "Active";
+            existingPlanOrder.showUser = true;
+            await existingPlanOrder.save();
+
+            res.status(200).send('Buddy plan activated and updated successfully');
+        } else {
+            res.status(502).send('No pending buddy plan found to activate');
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while activating the buddy plan');
+    }
+});
+
+
+exports.buddyToActiveBuddy = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Find the plan orders containing the specified buddy ID in buddyPlanMembers
+        const planData = await plandOrderModel.find({ buddyPlanMembers: id });
+
+        if (planData.length > 0) {
+            // Iterate through each plan order and update it
+            for (let plan of planData) {
+                // Remove the buddy ID from buddyPlanMembers
+                plan.buddyPlanMembers = plan.buddyPlanMembers.filter(member => member.toString() !== id);
+
+                // Add the buddy ID to activedBuddyPlanMembers
+                if (!plan.activedBuddyPlanMembers.includes(id)) {
+                    plan.activedBuddyPlanMembers.push(id);
+                }
+
+                // Save the updated plan order
+                await plan.save();
+            }
+
+            res.status(200).json({ message: 'Buddy successfully moved to activeBuddyMembers', updatedPlans: planData });
+        } else {
+            res.status(404).json({ message: 'No plan orders found with the specified buddy ID' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
