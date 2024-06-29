@@ -382,6 +382,7 @@ exports.getActiveStatus = asyncHandler(async (req, res) => {
 exports.createBuddyPlan = asyncHandler(async(req,res)=>{
     const {userId, userName, modeOfPayment, buddyPlanMembers, planId, amount, duration} = req.body
     const expiryDate = moment().add(duration, 'days').toDate();
+
     try {
         await plandOrderModel.create({
             userId:userId,
@@ -403,8 +404,13 @@ exports.createBuddyPlan = asyncHandler(async(req,res)=>{
 })
 
 exports.updateBuddyPlan = asyncHandler(async (req, res) => {
-    const { amount } = req.body;
+    const { amount, buddyPlanMembers } = req.body;
     const { id } = req.params;
+const planMembersCount = buddyPlanMembers.length + 1;
+const splitAmount = amount / planMembersCount;
+console.log(planMembersCount,'this is the members count')
+console.log(amount,'this is the members amount')
+console.log(splitAmount,'this is the split amount')
 
     try {
         // Find the existing plan order by its ID
@@ -412,7 +418,7 @@ exports.updateBuddyPlan = asyncHandler(async (req, res) => {
 
         if (existingPlanOrder) {
             // Update the existing plan order with the new amount and set status to Active
-            existingPlanOrder.amount = amount;
+            existingPlanOrder.amount = splitAmount;
             existingPlanOrder.activeStatus = "Active";
             existingPlanOrder.showUser = true;
             await existingPlanOrder.save();
