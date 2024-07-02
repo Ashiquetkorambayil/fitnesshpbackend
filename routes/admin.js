@@ -5,7 +5,7 @@ const verifyToken = require('../Middleware/verifyToken')
 var multer = require('multer')
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'public/images');
+        cb(null, './public/images');
     },
     filename: function (req, file, cb) {
         // Preserve the file extension
@@ -74,6 +74,7 @@ router.post('/postuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: '
 router.post('/createuser',upload.single('image'),userController.createUser)
 router.post('/postusersignin',userController.userPostSignIn)
 router.get('/getusers',verifyToken,userController.getUser)
+router.get('/getallusers',verifyToken,userController.getAllUsers)
 // router.get('/getsearchusers',verifyToken,userController.getSearchUsers)
 router.get('/getuserbyid/:id',userController.getUserById)
 router.delete('/deleteuser/:id',userController.deleteUser)

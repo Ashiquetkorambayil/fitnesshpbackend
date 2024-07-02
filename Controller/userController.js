@@ -261,22 +261,38 @@ exports.userPostSignIn = asyncHandler(async(req, res) => {
     }
 });
 
-
+exports.getAllUsers = asyncHandler(async(req,res)=>{
+    try {
+        const response = await userModel.find()
+        res.status(200).json(response)
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 exports.getUser = async (req, res) => {
     const search = req.query.search || '';
+    const limit = parseInt(req.query.limit) || 10; // default limit to 10
+    const skip = parseInt(req.query.skip) || 0;
+  
     try {
       const query = { 
         revealed: false,
         name: { $regex: search, $options: 'i' }
       };
-      const response = await userModel.find(query);
-      res.status(200).json(response);
+      const totalUsers = await userModel.countDocuments(query);
+      const users = await userModel.find(query).sort({ createdAt: -1 }).limit(limit).skip(skip);
+      
+      res.status(200).json({
+        users,
+        totalUsers
+      });
     } catch (err) {
       console.error(err); 
       res.status(500).send('An error occurred while fetching data');
     }
   };
+  
   
 
 

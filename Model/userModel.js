@@ -15,7 +15,8 @@ const userModel = new mongoose.Schema({
     plan:{type:String},
     token:{type: String},
     revealed:{type:Boolean, default:false},
-    authenticate:{type:Boolean, default:false}
+    authenticate:{type:Boolean, default:false},
+    createdAt:{ type: Date, default: Date.now }
 })
 
 userModel.pre('save', async function (next) {
