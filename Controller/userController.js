@@ -66,8 +66,8 @@ exports.onlineUser = asyncHandler(async (req, res) => {
 
 exports.postUser = asyncHandler(async (req, res) => {
     const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration, address} = req.body; 
-    const image = req.files['image'] ? req.files['image'][0].filename : undefined;
-    const idProof = req.files['idproof'] ? req.files['idproof'][0].filename : undefined;
+    const image = req.files['image'] ? `/public/images/${req.files['image'][0].filename}` : undefined;
+    const idProof = req.files['idproof'] ? `/public/images/${req.files['idproof'][0].filename}` : undefined;
 
   
     console.log(image, idProof, 'this is the image and the idProof')
