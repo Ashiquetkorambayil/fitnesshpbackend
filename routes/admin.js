@@ -89,11 +89,11 @@ router.get('/getuserbyphone/:phone',verifyToken,userController.getUserByPhone);
 
 router.post('/createplanorder',verifyToken,planOrderController.postPlandOrder)
 router.get('/getplanhistorybyuser/:id',planOrderController.getPlanOrderByUser)
+router.get('/getplanorders',verifyToken,planOrderController.getPlanOrders)
 router.get('/getlastplanorder/:id',verifyToken,planOrderController.getLastPlanOrderOfUser)
 router.get('/getfeedetailbyuser/:id',verifyToken,planOrderController.getPlanDetailsById)
 router.get('/getlastplansofallusers',planOrderController.getLastPlanOrderOfAllUsers)
 router.delete('/deleteplanorder/:id',verifyToken,planOrderController.deletePlanOrder)
-
 router.post('/creatependingorder',verifyToken,planOrderController.postPendingOrder)
 router.get('/getpendingorder',verifyToken,planOrderController.getPendingPlanOrders)
 router.get('/getpendingbuddyorders',verifyToken,planOrderController.getBuddyPending)

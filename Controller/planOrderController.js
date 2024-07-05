@@ -250,6 +250,43 @@ exports.getBuddyPending = asyncHandler(async (req, res) => {
     }
 });
 
+exports.getPlanOrders = asyncHandler(async (req, res) => {
+    try {
+      const { page = 1, month = '', date = '' } = req.query;
+      const limit = 10; // Number of results per page
+      let query = {};
+  
+      // Filter by month within the current year
+      if (month) {
+        const currentYear = new Date().getFullYear();
+        const startDate = new Date(currentYear, month - 1, 1);
+        const endDate = new Date(currentYear, month, 0);
+        query.selectedAt = { $gte: startDate, $lte: endDate };
+      }
+  
+      // Filter by specific date
+      if (date) {
+        const specificDate = new Date(date);
+        const nextDate = new Date(specificDate);
+        nextDate.setDate(nextDate.getDate() + 1);
+        query.selectedAt = { $gte: specificDate, $lt: nextDate };
+      }
+  
+      const count = await plandOrderModel.countDocuments(query);
+      const totalPages = Math.ceil(count / limit);
+      const results = await plandOrderModel.find(query)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .sort({ selectedAt: -1 });
+  
+      res.status(200).json({ data: results, totalPages });
+    } catch (error) {
+      console.error('Error fetching plan orders:', error);
+      res.status(500).json({ error: 'An error occurred while fetching plan orders' });
+    }
+  });
+  
+
 
 
 exports.updateOrderToActive = asyncHandler(async(req,res)=>{
