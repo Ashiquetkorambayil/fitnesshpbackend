@@ -502,3 +502,24 @@ exports.buddyToActiveBuddy = asyncHandler(async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+
+exports.monthlyReport = asyncHandler(async(req,res)=>{
+    const { month, year } = req.query;
+    
+    try {
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0);
+        
+        const planOrders = await plandOrderModel.find({
+            selectedAt: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        });
+        
+        res.status(200).json(planOrders);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})

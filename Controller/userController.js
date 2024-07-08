@@ -270,6 +270,60 @@ exports.getAllUsers = asyncHandler(async(req,res)=>{
     }
 })
 
+exports.getAllUsersReport = async (req, res) => {
+    try {
+      const { page = 1, limit = 10, month, year } = req.query;
+  
+      // Build the query object for filtering by month and year
+      let query = {};
+      if (month) {
+        query.createdAt = {
+          $gte: new Date(year, month - 1, 1),
+          $lt: new Date(year, month, 1)
+        };
+      } else if (year) {
+        query.createdAt = {
+          $gte: new Date(year, 0, 1),
+          $lt: new Date(parseInt(year) + 1, 0, 1)
+        };
+      }
+  
+      const users = await userModel.find(query)
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit))
+        .sort({ createdAt: -1 })
+        .exec();
+  
+      const usersWithStatus = await Promise.all(users.map(async (user) => {
+        const planOrders = await plandOrderModel.find({ userId: user._id });
+        let status;
+        if (planOrders.length === 0) {
+          status = 'No plan yet';
+        } else if (planOrders.length === 1) {
+          status = 'New join';
+        } else {
+          status = 'Renewal';
+        }
+        return { ...user.toObject(), status };
+      }));
+  
+      const count = await userModel.countDocuments(query);
+  
+      res.status(200).json({
+        total: count,
+        page: parseInt(page),
+        pages: Math.ceil(count / limit),
+        data: usersWithStatus,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  };
+  
+
+
+
 exports.getUser = async (req, res) => {
     const search = req.query.search || '';
     const limit = parseInt(req.query.limit) || 10; // default limit to 10

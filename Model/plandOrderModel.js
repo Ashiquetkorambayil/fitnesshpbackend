@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const planOrderModel = new mongoose.Schema({
-    userId: { type: String },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'userData' },
     userName: { type: String },
     modeOfPayment: { type: String },
     planId: { type: String },
@@ -10,6 +10,7 @@ const planOrderModel = new mongoose.Schema({
     selectedAt: { type: Date, default: Date.now },
     expiryDate: { type: Date },
     activeStatus: { type: String, enum: ["Active", "Expired", "Nearly Expire","Pending", "Rejected"]},
+    status: { type: String, enum: ['No plan yet', 'New join', 'Renewal'] },
     buddyPlanMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'userData' }],
     activedBuddyPlanMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'userData' }],
     show:{type:Boolean, default: true},
