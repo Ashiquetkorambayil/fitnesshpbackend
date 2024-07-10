@@ -3,60 +3,28 @@ const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// exports.postadmin = asyncHandler(async(req, res)=>{
-//     const {name, email, phone, role, password}= req.body
-//     const image = req.file ? req.file.filename : undefined;
-//     try{
-//         const postAdmin = await adminModel.create({
 
-//             name:name,
-//             email:email,
-//             phone:phone,
-//             role:role,
-//             image:image,
-//             password:password
-//         })
-//         res.json(postAdmin)
+exports.postadmin = asyncHandler(async(req, res)=>{
+    const {name, email, phone, role, password}= req.body
+    const image = req.file ? req.file.filename : undefined;
+    try{
+        const postAdmin = await adminModel.create({
+
+            name:name,
+            email:email,
+            phone:phone,
+            role:role,
+            image:image,
+            password:password
+        })
+        res.json(postAdmin)
            
-//     }catch(err){
-//         console.log(err)
-//     }
-// })
+    }catch(err){
+        console.log(err)
+    }
+})
 
-// exports.postsignin = asyncHandler(async(req, res) => {
-//     const { email, password } = req.body;
-//     console.log(password);
-    
-//     try {
-//         const postSignin = await adminModel.findOne({ email });
 
-//         if (!postSignin) {
-//             return res.status(400).json({ error: "Invalid email or password" });
-//         }
-
-//         const isPasswordMatch = await bcrypt.compare(password, postSignin.password);
-
-//         if (!isPasswordMatch) {
-//             return res.status(400).json({ error: "Invalid email or password" });
-//         }
-
-//         const token = jwt.sign({ email: postSignin.email }, "myjwtsecretkey");
-//         const userProfile = {
-//             id: postSignin._id,
-//             name: postSignin.name,
-//             email: postSignin.email,
-//             role: postSignin.role,
-//             phone: postSignin.phone,
-//             image: postSignin.image,
-//         };
-
-//         console.log(token , 'the token from backend');
-//         res.status(200).json({ token: token, admin: userProfile });
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({ error: "Internal Server Error" });
-//     }
-// });
 
 exports.postsignin = asyncHandler(async(req, res) => {
     const { email, password } = req.body;
@@ -123,9 +91,7 @@ exports.editAdmin = asyncHandler(async(req, res)=>{
     const {id} = req.params;
     const {name, phone, role, email} = req.body;
     const image = req.file ? req.file.filename : undefined;
-    console.log(req.params,'tjhe id')
-    console.log(req.body,'tjhe body')
-    console.log(req.file,'tjhe body')
+
     try{  
         const update = {
             image:image, 
