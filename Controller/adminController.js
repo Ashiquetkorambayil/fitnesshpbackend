@@ -57,7 +57,6 @@ exports.postsignin = asyncHandler(async(req, res) => {
         };
 
         res.status(200).json({ token: token, admin: userProfile });
-        console.log(token,'the token is here')
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "Internal Server Error" });
@@ -69,7 +68,6 @@ exports.getAdmin = asyncHandler(async(req,res)=>{
     try{
         const getItems = await adminModel.find();
         res.status(200).json(getItems);
-        console.log(getItems, 'the get items')
     }catch(err){
         console.error(err);
         res.status(500).json({error:"an error occurred while fectching data"})
@@ -100,7 +98,6 @@ exports.editAdmin = asyncHandler(async(req, res)=>{
             role:role,
             email:email
         }
-        console.log(update,'the data of update')
         const updateData = await adminModel.findByIdAndUpdate(id, {$set:update}, {new:true})
         res.status(200).json(updateData)
        

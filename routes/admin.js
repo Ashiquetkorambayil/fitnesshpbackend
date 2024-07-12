@@ -36,13 +36,13 @@ const enrollmetnController = require('../Controller/enrollmentController')
 const userController = require('../Controller/userController')
 const adminController = require('../Controller/adminController')
 const planOrderController = require('../Controller/planOrderController')
-const pendingOrdersController = require('../Controller/pendingOrderController')
 const paytmController = require('../Controller/paytmController')
 const paytmCheckoutController = require('../Controller/paytmCheckoutController')
 const razorpayController = require('../Controller/razorpayController')
 const optionsController = require('../Controller/optionsController');
 const campaignController = require('../Controller/campaignController')
-const { route } = require('.');
+const notificationController = require('../Controller/notificationController')
+
 
 
 // admin -----------------------------
@@ -117,6 +117,11 @@ router.get('/getoptionsbyid/:id',verifyToken,optionsController.getOptionsById);
 router.put('/updateoptions/:id',verifyToken,optionsController.editOptions);
 router.delete('/deleteoptions/:id',verifyToken,optionsController.deleteOptionsByid);
 
+// notification--------------------
+
+router.post('/createnotification',verifyToken,upload.single('image'),notificationController.createNotification)
+router.get('/getallnotification',verifyToken,notificationController.getAllNotifications);
+router.delete('/deletenotification/:id',verifyToken,notificationController.deleteNotification);
 // campaign--------------------
 router.post('/createcampaign',verifyToken,campaignController.createCampaign)
 router.get('/getcampaign',verifyToken,campaignController.getCampaign)

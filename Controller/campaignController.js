@@ -107,8 +107,7 @@ exports.deleteExpiredCampaigns = async () => {
 
             await CampaignModel.findByIdAndDelete(campaign._id);
         }
-
-        console.log('Expired campaigns deleted and discounts removed successfully');
+        res.status(200).send('Item deleted successfully')
     } catch (error) {
         console.error('Error deleting expired campaigns:', error);
         throw error;
@@ -119,7 +118,6 @@ exports.deleteExpiredCampaigns = async () => {
 exports.updateCampaign = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { name, planIds, discountType, discountValue, expiryDate } = req.body;
-    console.log('Request body for campaign update:', req.body);
 
     try {
         const campaign = await CampaignModel.findById(id);
@@ -161,7 +159,6 @@ exports.updateCampaign = asyncHandler(async (req, res) => {
         campaign.expiryDate = expiryDate;
         await campaign.save();
 
-        console.log('Campaign updated successfully');
         res.status(200).send('Campaign updated successfully');
     } catch (error) {
         console.error('Error updating campaign:', error);
