@@ -2,20 +2,22 @@ const Notification = require('../Model/notificationModal');
 const asyncHandler = require('express-async-handler')
 
 // Create a new notification
-exports.createNotification =asyncHandler(async (req, res) => {
-    try {
-        const { name, image } = req.body;
-        const newNotification = new Notification({
-            name,
-            image
-        });
+// exports.createNotification =asyncHandler(async (req, res) => {
+//     try {
+//         const { name, image, planId } = req.body;
+//         console.log(req.body,'this is the body')
+//         const newNotification = new Notification({
+//             name,
+//             image,
+//             planId
+//         });
 
-        const savedNotification = await newNotification.save();
-        res.status(201).json(savedNotification);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
+//         const savedNotification = await newNotification.save();
+//         res.status(201).json(savedNotification);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// });
 
 // Delete a notification by ID
 exports.deleteNotification = asyncHandler(async (req, res) => {

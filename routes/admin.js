@@ -119,7 +119,7 @@ router.delete('/deleteoptions/:id',verifyToken,optionsController.deleteOptionsBy
 
 // notification--------------------
 
-router.post('/createnotification',verifyToken,upload.single('image'),notificationController.createNotification)
+// router.post('/createnotification',verifyToken,upload.single('image'),notificationController.createNotification)
 router.get('/getallnotification',verifyToken,notificationController.getAllNotifications);
 router.delete('/deletenotification/:id',verifyToken,notificationController.deleteNotification);
 // campaign--------------------

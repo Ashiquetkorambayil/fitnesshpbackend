@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')
 
 const adminModel = new mongoose.Schema({
-    name:{type:String, required:true},
+    name:{type:String},
     image:{type:String},
-    phone:{type:Number, required:true},
-    password:{type:String, required:true},
-    email:{type:String, required:true},
-    role:{type:String, required:true},
+    phone:{type:Number},
+    password:{type:String},
+    email:{type:String},
+    role:{type:String},
     token:{type: String}
 })
 

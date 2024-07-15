@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const plandOrderModel = require('../Model/plandOrderModel');
 const moment = require('moment'); // Import moment library for date manipulation
 const userModel = require('../Model/userModel')
+const notificationModel = require('../Model/notificationModal')
 
 // phonepay for testing purpose------------
 const PHONE_PAY_HOST_URL = 'https://api-preprod.phonepe.com/apis/pg-sandbox';
@@ -169,7 +170,6 @@ exports.getLastPlanOrderOfAllUsers = asyncHandler(async (req, res) => {
 
 exports.getPlanDetailsById = asyncHandler(async(req,res)=>{
     const {id} = req.params
-    console.log(req.params,'haihfoiashdfoiasiodfhioasdhpfio')
     try{
         const response = await plandOrderModel.findById(id)
         res.status(200).json(response)
@@ -194,13 +194,13 @@ exports.deletePlanOrder = asyncHandler(async(req,res)=>{
 
 
 exports.postPendingOrder = asyncHandler(async(req,res)=>{
-    const { userId, planId, name, amount, duration, userName, modeOfPayment } = req.body;
+    const { userId, planId, name, amount, duration, userName, modeOfPayment, image } = req.body;
     try{
         // Calculate expiry date by adding duration months to the current date
         const expiryDate = moment().add(duration, 'days').toDate();
         console.log(expiryDate,'this is the expiry date')
         // Create plan order with expiry date and activeStatus set to "Pending"
-        await plandOrderModel.create({ 
+       const plandOrder =  await plandOrderModel.create({ 
             userId,
             planId, 
             userName,
@@ -211,12 +211,21 @@ exports.postPendingOrder = asyncHandler(async(req,res)=>{
             modeOfPayment,
             activeStatus: "Pending" // Set activeStatus to "Pending"
         });
+
+        await notificationModel.create({
+            name:userName,
+            amount,
+            image,
+            planId: plandOrder._id,
+            pendingPlan: true
+        })
         
         res.json({ message: 'User plan selected successfully' });
     } catch(err){
         console.log(err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
+
 });
 
 exports.getPendingPlanOrders = asyncHandler(async (req, res) => {
