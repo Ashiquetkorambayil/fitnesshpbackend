@@ -426,11 +426,11 @@ exports.getActiveStatus = asyncHandler(async (req, res) => {
 });
 
 exports.createBuddyPlan = asyncHandler(async(req,res)=>{
-    const {userId, userName, modeOfPayment, buddyPlanMembers, planId, amount, duration} = req.body
+    const {userId, userName, modeOfPayment, buddyPlanMembers, planId, amount, duration, image} = req.body
     const expiryDate = moment().add(duration, 'days').toDate();
 
     try {
-        await plandOrderModel.create({
+      const plandOrder =  await plandOrderModel.create({
             userId:userId,
             userName:userName,
             modeOfPayment:modeOfPayment,
@@ -442,6 +442,14 @@ exports.createBuddyPlan = asyncHandler(async(req,res)=>{
             duration:duration,
             expiryDate:expiryDate
         })
+        await notificationModel.create({
+            name:userName,
+            amount,
+            image,
+            planId: plandOrder._id,
+            pendingPlan: true
+        })
+        
         res.status(200).send('Buddy plan created successfully')
     } catch (error) {
         console.log(error)

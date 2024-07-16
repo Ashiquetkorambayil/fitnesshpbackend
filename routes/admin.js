@@ -47,11 +47,12 @@ const notificationController = require('../Controller/notificationController')
 
 // admin -----------------------------
 
-// router.post('/postadmin',adminController.postadmin);
+router.post('/postadmin',adminController.postadmin);
 router.post('/postsignin',adminController.postsignin);
 router.get('/getadmin',verifyToken,adminController.getAdmin);
 router.get('/getadminbyid/:id',verifyToken,adminController.getAdminById);
 router.put('/updateadminbyid/:id',upload.single('image'),verifyToken,adminController.editAdmin);
+router.put('/adminchangepassword/:id',verifyToken,adminController.adminChangepassword);
 
 // plans------
 
@@ -84,7 +85,7 @@ router.put('/revealuser/:id',verifyToken,userController.revealUser)
 router.get('/getrevealedusers',verifyToken,userController.getrevealedUser)
 router.put('/unreveal/:id',verifyToken,userController.unrevealUser)
 router.post('/onlineuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.onlineUser)
-router.put('/changepassword/:id',userController.changepassword);
+router.put('/changepassword/:id',verifyToken,userController.changepassword);
 router.get('/getuserbyphone/:phone',verifyToken,userController.getUserByPhone);
 // plan orders ----------------
 
