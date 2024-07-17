@@ -65,7 +65,7 @@ exports.onlineUser = asyncHandler(async (req, res) => {
 
 
 exports.postUser = asyncHandler(async (req, res) => {
-    const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration, address} = req.body; 
+    const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration, address, dateOfJoining} = req.body; 
     const image = req.files['image'] ? req.files['image'][0].filename : undefined;
     const idProof = req.files['idproof'] ? req.files['idproof'][0].filename : undefined;
 
@@ -84,7 +84,7 @@ exports.postUser = asyncHandler(async (req, res) => {
             return res.status(409).json({ message: "Phone number already exists" });
         }
         // const expiryDate = moment().add(duration, 'months').toDate();
-        const expiryDate = moment().add(duration, 'days').toDate();
+         const expiryDate = moment(dateOfJoining).add(duration, 'days').toDate();
 
         
         // Create the user
@@ -101,6 +101,7 @@ exports.postUser = asyncHandler(async (req, res) => {
             idProof,
             address,
             authenticate: true,
+            createdAt:dateOfJoining
         });
         const newPlanOrder = await plandOrderModel.create({
             userId: newUser._id,
@@ -112,7 +113,8 @@ exports.postUser = asyncHandler(async (req, res) => {
             modeOfPayment: modeOfPayment,
             userName: name,
             activeStatus:'Active',
-            showUser:true
+            showUser:true,
+            selectedAt:dateOfJoining
         })
         
         // Log the successful creation
