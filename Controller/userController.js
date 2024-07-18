@@ -13,7 +13,7 @@ exports.onlineUser = asyncHandler(async (req, res) => {
     
     try {
         // Validate inputs
-        if (!name || !phone || !password || !height || !weight || !dateOfBirth || !blood || !email || !idProof || !address) {
+        if (!name || !phone || !password  || !dateOfBirth || !blood || !email || !idProof || !address) {
             return res.status(400).json({ message: "All fields are required" });
         }
         
@@ -70,11 +70,10 @@ exports.postUser = asyncHandler(async (req, res) => {
     const idProof = req.files['idproof'] ? req.files['idproof'][0].filename : undefined;
 
   
-    console.log(image, idProof, 'this is the image and the idProof')
     
     try {
         // Validate inputs
-        if (!name || !phone || !password || !height || !weight || !dateOfBirth || !blood || !email || !idProof || !address) {
+        if (!name || !phone || !password || !dateOfBirth || !blood || !email || !idProof || !address) {
             return res.status(400).json({ message: "All fields are required" });
         }
         
