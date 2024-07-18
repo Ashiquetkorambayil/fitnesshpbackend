@@ -110,6 +110,7 @@ exports.adminChangepassword = asyncHandler(async(req, res)=>{
     const {id} = req.params
    
     const {oldPassword , newPassword, cPassword} = req.body;
+    console.log(req.body,'this is the body')
 
     try {
         const changePasswrod = await adminModel.findById(id)
