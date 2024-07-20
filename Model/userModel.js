@@ -2,17 +2,17 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userModel = new mongoose.Schema({
-    name: { type: String, required: true },
+    name: { type: String},
     image: { type: String },
     phone: { type: Number, required: true },
     password: { type: String, required: true },
     height: { type: String},
     weight: { type: String},
-    dateOfBirth: { type: String, required: true },
-    blood: { type: String, required: true },
-    email: { type: String, required: true },
-    idProof: { type: String, required: true },
-    address: { type: String, required: true },
+    dateOfBirth: { type: String},
+    blood: { type: String},
+    email: { type: String },
+    idProof: { type: String },
+    address: { type: String},
     plan: { type: String },
     token: { type: String },
     revealed: { type: Boolean, default: false },

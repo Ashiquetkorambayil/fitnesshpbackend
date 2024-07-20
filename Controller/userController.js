@@ -73,7 +73,7 @@ exports.postUser = asyncHandler(async (req, res) => {
     
     try {
         // Validate inputs
-        if (!name || !phone || !password || !dateOfBirth || !blood || !email || !idProof || !address) {
+        if ( !phone || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
         
