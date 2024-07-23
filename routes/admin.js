@@ -43,7 +43,7 @@ const razorpayController = require('../Controller/razorpayController')
 const optionsController = require('../Controller/optionsController');
 const campaignController = require('../Controller/campaignController')
 const notificationController = require('../Controller/notificationController')
-
+const subCategoryController = require('../Controller/subCategoryController')
 
 
 // admin -----------------------------
@@ -108,7 +108,6 @@ router.put('/buddytoactivate/:id',verifyToken,planOrderController.buddyToActiveB
 router.get('/getallstatus',verifyToken,planOrderController.getAllStatus)
 router.get('/getactiveusers',verifyToken,planOrderController.getActiveStatus)
 
-
 router.post('/createbuddyplan',verifyToken,planOrderController.createBuddyPlan)
 router.post('/spreadplan',verifyToken,planOrderController.spreadPlanForBuddy)
 
@@ -139,6 +138,14 @@ router.post('/paynow',paytmCheckoutController.paytmPayment)
 
 router.post('/pay',razorpayController.order)
 router.post('/validate',razorpayController.validate)
+
+// sub-category------------
+
+router.post('/postsubcategory',verifyToken,subCategoryController.createSubCategory)
+router.get('/getallsubcategory',verifyToken,subCategoryController.getAllSubCategories)
+router.get('/getsubcategorybyid/:id',verifyToken,subCategoryController.getSubCategoryById)
+router.put('/updatesubcategory/:id',verifyToken,subCategoryController.updateSubCategory)
+router.delete('/deletesubcategory/:id',verifyToken, subCategoryController.deleteSubCategory)
 // router.post('/creatependingorder',verifyToken,pendingOrdersController.postPendingOrder)
 // router.get('/getpendingorder',verifyToken,pendingOrdersController.getPendingOrder)
 // router.post('/updatependingorderstatus',verifyToken,pendingOrdersController.updatePendingOrderStatus)
