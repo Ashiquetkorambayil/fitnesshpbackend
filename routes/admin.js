@@ -72,20 +72,20 @@ router.get('/getenrollmentbyid/:id',enrollmetnController.getEnrollmentById)
 router.put('/putenrollment/:id',enrollmetnController.putEnrollment)
 
 // users-----------------
-router.post('/postuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.postUser)
-router.post('/createuser',upload.single('image'),userController.createUser)
-router.post('/postusersignin',userController.userPostSignIn)
-router.get('/getusers',verifyToken,userController.getUser)
-router.get('/getallusers',verifyToken,userController.getAllUsers)
-router.get('/getallusersreport',verifyToken,userController.getAllUsersReport)
+router.post('/postuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.postUser);
+router.post('/createuser',upload.single('image'),userController.createUser);
+router.post('/postusersignin',userController.userPostSignIn);
+router.get('/getusers',verifyToken,userController.getUser);
+router.get('/getallusers',verifyToken,userController.getAllUsers);
+router.get('/getallusersreport',verifyToken,userController.getAllUsersReport);
 // router.get('/getsearchusers',verifyToken,userController.getSearchUsers)
-router.get('/getuserbyid/:id',userController.getUserById)
+router.get('/getuserbyid/:id',userController.getUserById);
 router.delete('/deleteuser/:id',userController.deleteUser)
-router.put('/edituser/:id',upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.editUser)
-router.put('/revealuser/:id',verifyToken,userController.revealUser)
-router.get('/getrevealedusers',verifyToken,userController.getrevealedUser)
-router.put('/unreveal/:id',verifyToken,userController.unrevealUser)
-router.post('/onlineuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.onlineUser)
+router.put('/edituser/:id',upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.editUser);
+router.put('/revealuser/:id',verifyToken,userController.revealUser);
+router.get('/getrevealedusers',verifyToken,userController.getrevealedUser);
+router.put('/unreveal/:id',verifyToken,userController.unrevealUser);
+router.post('/onlineuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.onlineUser);
 router.put('/changepassword/:id',verifyToken,userController.changepassword);
 router.get('/getuserbyphone/:phone',verifyToken,userController.getUserByPhone);
 // plan orders ----------------
@@ -144,6 +144,7 @@ router.post('/validate',razorpayController.validate)
 router.post('/postsubcategory',verifyToken,subCategoryController.createSubCategory)
 router.get('/getallsubcategory',verifyToken,subCategoryController.getAllSubCategories)
 router.get('/getsubcategorybyid/:id',verifyToken,subCategoryController.getSubCategoryById)
+router.get('/getsubcategoriesbyid/:id',verifyToken,subCategoryController.getSubCategoriesById)
 router.put('/updatesubcategory/:id',verifyToken,subCategoryController.updateSubCategory)
 router.delete('/deletesubcategory/:id',verifyToken, subCategoryController.deleteSubCategory)
 // router.post('/creatependingorder',verifyToken,pendingOrdersController.postPendingOrder)

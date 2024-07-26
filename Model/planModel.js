@@ -5,8 +5,11 @@ const planModel = new mongoose.Schema({
     duration:{type:Number, required:true},
     description:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'subCategoryData',
-        required: true,
+        ref: 'subCategoryData'
+    },
+    category:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'optionsData'
     },
     amountBeforeDiscount: { type: Number }
 })

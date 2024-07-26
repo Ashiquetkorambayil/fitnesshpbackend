@@ -35,6 +35,19 @@ exports.getSubCategoryById = asyncHandler(async (req, res) => {
     }
 });
 
+exports.getSubCategoriesById = asyncHandler(async (req, res) => {
+    const {id} = req.params
+    try {
+        const subCategory = await subCategoryData.find({category : id}).populate('category');
+        if (!subCategory) {
+            return res.status(404).json({ message: 'Sub-category not found' });
+        }
+        res.status(200).json(subCategory);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // Update a sub-category by ID
 exports.updateSubCategory = asyncHandler(async (req, res) => {
     try {
