@@ -1,4 +1,5 @@
 const adminModel = require('../Model/adminModel');
+const staffModel = require('../Model/staffModel');
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -24,44 +25,97 @@ exports.postadmin = asyncHandler(async(req, res)=>{
     }
 })
 
-
-
-exports.postsignin = asyncHandler(async(req, res) => {
-    const { email, password } = req.body;
+// exports.postsignin = asyncHandler(async(req, res) => {
+//     const { email, password } = req.body;
     
+//     try {
+//         const postSignin = await adminModel.findOne({ email });
+
+//         if (!postSignin) {
+//             return res.status(400).json({ error: "Invalid email or password" });
+//         }
+
+//         const isPasswordMatch = await bcrypt.compare(password, postSignin.password);
+
+//         if (!isPasswordMatch) {
+//             return res.status(400).json({ error: "Invalid email or password" });
+//         }
+
+//         const token = jwt.sign({ email: postSignin.email }, "myjwtsecretkey");
+
+//         // Update the admin document in the database to save the token
+//         await adminModel.findByIdAndUpdate(postSignin._id, { token: token });
+
+//         const userProfile = {
+//             id: postSignin._id,
+//             name: postSignin.name,
+//             email: postSignin.email,
+//             role: postSignin.role,
+//             phone: postSignin.phone,
+//             image: postSignin.image,
+//         };
+
+//         res.status(200).json({ token: token, admin: userProfile });
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).json({ error: "Internal Server Error" });
+//     }
+// });
+
+
+
+exports.postsignin = asyncHandler(async (req, res) => {
+    const { email, phoneNumber, password } = req.body;
+  
     try {
-        const postSignin = await adminModel.findOne({ email });
-
-        if (!postSignin) {
-            return res.status(400).json({ error: "Invalid email or password" });
-        }
-
-        const isPasswordMatch = await bcrypt.compare(password, postSignin.password);
-
-        if (!isPasswordMatch) {
-            return res.status(400).json({ error: "Invalid email or password" });
-        }
-
-        const token = jwt.sign({ email: postSignin.email }, "myjwtsecretkey");
-
-        // Update the admin document in the database to save the token
-        await adminModel.findByIdAndUpdate(postSignin._id, { token: token });
-
-        const userProfile = {
-            id: postSignin._id,
-            name: postSignin.name,
-            email: postSignin.email,
-            role: postSignin.role,
-            phone: postSignin.phone,
-            image: postSignin.image,
-        };
-
-        res.status(200).json({ token: token, admin: userProfile });
+      let user;
+      let role;
+      let tokenField;
+  
+      if (email) {
+        user = await adminModel.findOne({ email });
+        role = "admin";
+        tokenField = "tokens";
+      } else if (phoneNumber) {
+        user = await staffModel.findOne({ phoneNumber });
+        role = "staff";
+        tokenField = "staffToken";
+      }
+  
+      if (!user) {
+        return res.status(400).json({ error: "Invalid credentials" });
+      }
+  
+      const isPasswordMatch = await bcrypt.compare(password, user.password);
+  
+      if (!isPasswordMatch) {
+        return res.status(400).json({ error: "Invalid credentials" });
+      }
+  
+      let token;
+      if (role === "admin") {
+        token = jwt.sign({ id: user._id, role: role }, "myjwtsecretkey");
+        await adminModel.findByIdAndUpdate(user._id, { [tokenField]: token });
+      } else if (role === "staff") {
+        token = jwt.sign({ id: user._id, role: role }, "myjwtsecretkey");
+        await staffModel.findByIdAndUpdate(user._id, { [tokenField]: token });
+      }
+  
+      const userProfile = {
+        id: user._id,
+        name: user.name,
+        email: user.email || "",
+        role: role,
+        phone: user.phone || "",
+        image: user.image || "",
+      };
+  
+      res.status(200).json({ token: token, user: userProfile });
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "Internal Server Error" });
+      console.log(err);
+      res.status(500).json({ error: "Internal Server Error" });
     }
-});
+  });
 
 
 exports.getAdmin = asyncHandler(async(req,res)=>{

@@ -44,6 +44,7 @@ const optionsController = require('../Controller/optionsController');
 const campaignController = require('../Controller/campaignController')
 const notificationController = require('../Controller/notificationController')
 const subCategoryController = require('../Controller/subCategoryController')
+const staffController = require('../Controller/staffController')
 
 
 // admin -----------------------------
@@ -147,9 +148,14 @@ router.get('/getsubcategorybyid/:id',verifyToken,subCategoryController.getSubCat
 router.get('/getsubcategoriesbyid/:id',verifyToken,subCategoryController.getSubCategoriesById)
 router.put('/updatesubcategory/:id',verifyToken,subCategoryController.updateSubCategory)
 router.delete('/deletesubcategory/:id',verifyToken, subCategoryController.deleteSubCategory)
-// router.post('/creatependingorder',verifyToken,pendingOrdersController.postPendingOrder)
-// router.get('/getpendingorder',verifyToken,pendingOrdersController.getPendingOrder)
-// router.post('/updatependingorderstatus',verifyToken,pendingOrdersController.updatePendingOrderStatus)
+
+// staff---------------
+router.post('/staffcreate', staffController.createStaff);
+router.put('/staffedit/:id', staffController.editStaff);
+router.delete('/staffdelet/:id', staffController.deleteStaff);
+router.post('/staffsignin/signin', staffController.signInStaff);
+router.get('/staffsget', staffController.getStaff);
+router.get('/staffgetbyid/:id', staffController.getStaffById);
 
 
 module.exports = router;
