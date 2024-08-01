@@ -1,4 +1,3 @@
-require('dotenv').config();
 const userModel = require('../Model/userModel');
 const plandOrderModel = require('../Model/plandOrderModel');
 const asyncHandler = require('express-async-handler');
@@ -511,8 +510,8 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
-                user: 'fitnesshp487@gmail.com',
-                pass: 'kbry cmru lyrx mzza'
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             }
         });
 

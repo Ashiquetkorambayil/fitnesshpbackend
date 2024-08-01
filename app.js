@@ -10,6 +10,9 @@ const adminRouter = require('./routes/admin');
 const phonepeRouter = require('./routes/phonePeRoute')
 const bodyParser = require('body-parser');
 const paytmRoutes = require('./routes/paytmRoutes');
+const dotenv = require('dotenv')
+
+dotenv.config();
 
 const cors = require('cors');
 
