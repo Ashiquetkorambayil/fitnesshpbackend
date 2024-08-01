@@ -73,7 +73,13 @@ router.get('/getenrollmentbyid/:id',enrollmetnController.getEnrollmentById)
 router.put('/putenrollment/:id',enrollmetnController.putEnrollment)
 
 // users-----------------
-router.post('/postuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.postUser);
+// For forgot password request
+router.post('/forgotpassword', userController.forgotPassword);
+
+// For password reset using token
+router.post('/resetpassword/:token', userController.resetPassword);
+
+router.post('/postuser', verifyToken,upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idProof', maxCount: 1 }]),userController.postUser);
 router.post('/createuser',upload.single('image'),userController.createUser);
 router.post('/postusersignin',userController.userPostSignIn);
 router.get('/getusers',verifyToken,userController.getUser);

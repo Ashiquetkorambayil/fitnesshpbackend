@@ -17,6 +17,8 @@ const userModel = new mongoose.Schema({
     token: { type: String },
     revealed: { type: Boolean, default: false },
     authenticate: { type: Boolean, default: false },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     createdAt: { type: Date, default: Date.now }
 });
 

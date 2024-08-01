@@ -1,7 +1,10 @@
+require('dotenv').config();
 const userModel = require('../Model/userModel');
 const plandOrderModel = require('../Model/plandOrderModel');
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
 
@@ -67,7 +70,9 @@ exports.onlineUser = asyncHandler(async (req, res) => {
 exports.postUser = asyncHandler(async (req, res) => {
     const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration, address, dateOfJoining} = req.body; 
     const image = req.files['image'] ? req.files['image'][0].filename : undefined;
-    const idProof = req.files['idproof'] ? req.files['idproof'][0].filename : undefined;
+    const idProof = req.files['idProof'] ? req.files['idProof'][0].filename : undefined;
+
+    console.log("this is the body", req.body)
 
   
     
@@ -97,7 +102,7 @@ exports.postUser = asyncHandler(async (req, res) => {
             dateOfBirth,
             blood,
             email,
-            idProof,
+            idProof:idProof,
             address,
             authenticate: true,
             createdAt:dateOfJoining
@@ -479,5 +484,90 @@ exports.getUserByPhone = asyncHandler(async (req, res) => {
         // Log and handle errors
         console.error("Error fetching user by phone:", err);
         res.status(500).json({ message: 'An error occurred while fetching user' });
+    }
+});
+
+
+exports.forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    console.log(email,'this is the mail')
+
+    try {
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'No user found with that email address' });
+        }
+
+        // Generate a token
+        const token = crypto.randomBytes(20).toString('hex');
+
+        // Set token and expiry date
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+        await user.save();
+
+        // Send email
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const mailOptions = {
+            to: user.email,
+            from: process.env.EMAIL_USER,
+            subject: 'Password Reset Request',
+            text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+            Please click on the following link, or paste this into your browser to complete the process:\n\n
+            https://fitnesshpclient.web.app/resetpassword/${token}\n\n
+            If you did not request this, please ignore this email and your password will remain unchanged.\n`
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ message: 'Password reset link sent to your email address' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'An error occurred' });
+    }
+});
+
+exports.resetPassword = asyncHandler(async (req, res) => {
+    const { token } = req.params;
+    const { newPassword, confirmPassword } = req.body;
+
+    try {
+        // Find user by token and check if the token has expired
+        const user = await userModel.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
+        }
+
+        // Check if the new passwords match
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+        }
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update user's password and clear the reset token fields
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        res.status(200).json({ message: 'Password has been reset successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'An error occurred' });
     }
 });
