@@ -508,11 +508,14 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
 
         // Send email
         const transporter = nodemailer.createTransport({
-            service: 'Gmail',
+            service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
-            }
+            },
+            secure: true,
+            port: 465,
+            debug: true // Enable debugging
         });
 
         const mailOptions = {
