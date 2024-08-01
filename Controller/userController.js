@@ -331,7 +331,7 @@ exports.getAllUsersReport = async (req, res) => {
 
 exports.getUser = async (req, res) => {
     const search = req.query.search || '';
-    const limit = parseInt(req.query.limit) || 10; // default limit to 10
+    const limit = parseInt(req.query.limit) || 30; // default limit to 10
     const skip = parseInt(req.query.skip) || 0;
   
     try {
