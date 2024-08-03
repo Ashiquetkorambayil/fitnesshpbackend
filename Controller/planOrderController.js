@@ -300,7 +300,7 @@ exports.getPlanOrders = asyncHandler(async (req, res) => {
 
 exports.updateOrderToActive = asyncHandler(async(req,res)=>{
     const { id } = req.params;
-    const {userId} = req.body;
+    const {userId, amount} = req.body;
     console.log(userId, 'the user Id ')
     try{
         // Find the plan order by its ID
@@ -315,6 +315,7 @@ exports.updateOrderToActive = asyncHandler(async(req,res)=>{
         // Update the activeStatus to "Active" and show value to false
         order.activeStatus = "Active";
         order.show = false;
+        order.amount = amount;
         order.showUser = true;
         user.authenticate = true
 
