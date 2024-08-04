@@ -114,6 +114,7 @@ router.put('/updatetoreject/:id',verifyToken,planOrderController.updateOrderToRe
 router.put('/buddytoactivate/:id',verifyToken,planOrderController.buddyToActiveBuddy)
 router.get('/getallstatus',verifyToken,planOrderController.getAllStatus)
 router.get('/getactiveusers',verifyToken,planOrderController.getActiveStatus)
+router.put('/updatependingamount/:id',verifyToken,planOrderController.updatePendingorderAmt)
 
 router.post('/createbuddyplan',verifyToken,planOrderController.createBuddyPlan)
 router.post('/spreadplan',verifyToken,planOrderController.spreadPlanForBuddy)

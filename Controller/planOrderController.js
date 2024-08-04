@@ -179,6 +179,21 @@ exports.getPlanDetailsById = asyncHandler(async(req,res)=>{
     }
 })
 
+exports.updatePendingorderAmt = asyncHandler(async(req,res)=>{
+    const {id} = req.params;
+    const {amount} = req.body;
+    console.log(req.body,'the req body')
+    try {
+        const order = await plandOrderModel.findById(id)
+        order.amount = amount
+        await order.save();
+        res.status(200).send('Amount updated successfully')
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('An error occured while updating amount')
+    }
+})
+
 exports.deletePlanOrder = asyncHandler(async(req,res)=>{
     const {id} = req.params
     try{
@@ -300,8 +315,8 @@ exports.getPlanOrders = asyncHandler(async (req, res) => {
 
 exports.updateOrderToActive = asyncHandler(async(req,res)=>{
     const { id } = req.params;
-    const {userId, amount} = req.body;
-    console.log(userId, 'the user Id ')
+    const {userId} = req.body;
+    
     try{
         // Find the plan order by its ID
         const order = await plandOrderModel.findById(id);
@@ -315,7 +330,6 @@ exports.updateOrderToActive = asyncHandler(async(req,res)=>{
         // Update the activeStatus to "Active" and show value to false
         order.activeStatus = "Active";
         order.show = false;
-        order.amount = amount;
         order.showUser = true;
         user.authenticate = true
 
