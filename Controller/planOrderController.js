@@ -181,17 +181,31 @@ exports.getPlanDetailsById = asyncHandler(async(req,res)=>{
 
 exports.updatePendingorderAmt = asyncHandler(async(req,res)=>{
     const {id} = req.params;
-    const {amount, selectedAt} = req.body;
+    const {amount} = req.body;
     console.log(req.body,'the req body')
     try {
         const order = await plandOrderModel.findById(id)
         order.amount = amount
-        order.selectedAt = selectedAt
         await order.save();
         res.status(200).send('Amount updated successfully')
     } catch (error) {
         console.log(error)
         res.status(500).send('An error occured while updating amount')
+    }
+})
+
+exports.updatePendingorderDate = asyncHandler(async(req,res)=>{
+    const {id} = req.params;
+    const {selectedAt} = req.body;
+    console.log(req.body,'the req body')
+    try {
+        const order = await plandOrderModel.findById(id)
+        order.selectedAt = selectedAt
+        await order.save();
+        res.status(200).send('Date updated successfully')
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('An error occured while updating Date')
     }
 })
 
