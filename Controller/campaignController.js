@@ -27,7 +27,6 @@ exports.createCampaign = asyncHandler(async(req,res) => {
         const campaign = new CampaignModel({ name, planIds, discountType, discountValue, expiryDate });
         await campaign.save();
 
-        console.log('Campaign created and discount applied successfully');
         res.status(200).send('Campaign created and discount applied successfully');
     } catch (error) {
         console.error('Error creating campaign:', error);
@@ -82,7 +81,6 @@ exports.deleteCampaign = asyncHandler(async (req,res) => {
         // Delete the campaign
         await CampaignModel.findByIdAndDelete(id);
          res.status(200).send('item deleted successfully')
-        console.log('Campaign deleted and discount removed successfully');
     } catch (error) {
         console.error('Error deleting campaign:', error);
     }

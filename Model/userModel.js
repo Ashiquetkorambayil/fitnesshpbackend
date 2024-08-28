@@ -19,7 +19,8 @@ const userModel = new mongoose.Schema({
     authenticate: { type: Boolean, default: false },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    fcmToken:{type:String}
 });
 
 userModel.pre('save', async function (next) {

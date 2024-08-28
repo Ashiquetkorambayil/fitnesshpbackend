@@ -3,7 +3,6 @@ const asyncHandler = require('express-async-handler');
 
 exports.postPlan = asyncHandler(async(req, res)=>{
     const {hour, amount, duration, description, category} = req.body
-    console.log(req.body,"the dataaaaaaaaaaaaaa")
     
     try{
         await planModel.create({
@@ -46,7 +45,6 @@ exports.getPlansById = asyncHandler(async(req,res)=>{
 
 exports.getPlansByOptions = asyncHandler(async(req,res)=>{
     const {id} = req.params
-    console.log(req.params,'teh id')
     try{
         const response = await planModel.find({description : id})
         res.status(200).json(response)

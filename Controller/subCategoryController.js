@@ -68,7 +68,6 @@ exports.updateSubCategory = asyncHandler(async (req, res) => {
 // Delete a sub-category by ID
 exports.deleteSubCategory = asyncHandler(async (req, res) => {
     const {id} = req.params
-    console.log(req.params,'this is the params')
     try {
          await subCategoryData.findByIdAndDelete(id);
         res.status(200).json({ message: 'Sub-category deleted successfully' });

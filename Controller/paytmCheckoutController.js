@@ -11,7 +11,6 @@ const paytmConfig = {
 
 exports.paytmPayment = asyncHandler(async (req, res) => {
     const { orderId, amount } = req.body;
-    console.log(req.body, 'this is the body');
     const paytmParams = {
         MID: paytmConfig.mid,
         WEBSITE: paytmConfig.website,
@@ -25,12 +24,10 @@ exports.paytmPayment = asyncHandler(async (req, res) => {
         MOBILE_NO: '7777777777'
     };
 
-    console.log(paytmParams, 'this is the paytm params');
 
     const checksum = generateChecksum(paytmParams, paytmConfig.key);
     paytmParams.CHECKSUMHASH = checksum;
 
-    console.log(checksum, 'this is the checksum');
 
     try {
         const response = await axios.post(`https://securegw-stage.paytm.in/theia/api/v1/initiateTransaction?mid=${paytmConfig.mid}&orderId=${orderId}`, 
@@ -60,11 +57,9 @@ exports.paytmPayment = asyncHandler(async (req, res) => {
             }
         });
 
-        console.log(response.data, 'this is the full response from Paytm');
         
         if (response.data && response.data.body && response.data.body.txnToken) {
             res.json({ token: response.data.body.txnToken });
-            console.log(response.data.body.txnToken, 'this is the response from backend');
         } else {
             throw new Error('Unable to get txnToken from Paytm response');
         }

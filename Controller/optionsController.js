@@ -41,8 +41,6 @@ exports.editOptions = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { options } = req.body;
 
-    console.log('Received ID:', id);
-    console.log('Received Body:', req.body);
 
     try {
         const update = {

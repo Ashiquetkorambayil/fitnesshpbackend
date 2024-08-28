@@ -45,6 +45,7 @@ const campaignController = require('../Controller/campaignController')
 const notificationController = require('../Controller/notificationController')
 const subCategoryController = require('../Controller/subCategoryController')
 const staffController = require('../Controller/staffController')
+const notification = require('../Controller/firebaseNotification')
 
 
 // admin -----------------------------
@@ -116,6 +117,10 @@ router.get('/getallstatus',verifyToken,planOrderController.getAllStatus)
 router.get('/getactiveusers',verifyToken,planOrderController.getActiveStatus)
 router.put('/updatependingamount/:id',verifyToken,planOrderController.updatePendingorderAmt)
 router.put('/updatependingdate/:id',verifyToken,planOrderController.updatePendingorderDate)
+router.put('/updatependingduration/:id',verifyToken,planOrderController.updateOrderDurationAndExpiry)
+router.put('/pauseplan/:id',verifyToken,planOrderController.pausePlan)
+router.put('/unpauseplan/:id',verifyToken,planOrderController.unpausePlan)
+
 
 router.post('/createbuddyplan',verifyToken,planOrderController.createBuddyPlan)
 router.post('/spreadplan',verifyToken,planOrderController.spreadPlanForBuddy)
@@ -164,6 +169,9 @@ router.delete('/staffdelet/:id', staffController.deleteStaff);
 router.post('/staffsignin/signin', staffController.signInStaff);
 router.get('/staffsget', staffController.getStaff);
 router.get('/staffgetbyid/:id', staffController.getStaffById);
+
+// notification --------------------
+router.post('/notify',notification.Notification)
 
 
 module.exports = router;

@@ -34,7 +34,7 @@ exports.order = asyncHandler(async(req,res) => {
 
 exports.validate = asyncHandler(async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, planId, name, amount, duration, userName, modeOfPayment, image } = req.body;
-    console.log(req.body, 'the reqbody');
+   
 
     const sha = crypto.createHmac("sha256", razorpayKeySecret);
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);

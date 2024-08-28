@@ -46,8 +46,6 @@ exports.onlineUser = asyncHandler(async (req, res) => {
         });
         
         
-        // Log the successful creation
-        // console.log("New user created:", newUser, newPlanOrder);
 
         // Respond with success message and the created user
         res.status(200).json({
@@ -71,7 +69,6 @@ exports.postUser = asyncHandler(async (req, res) => {
     const image = req.files['image'] ? req.files['image'][0].filename : undefined;
     const idProof = req.files['idProof'] ? req.files['idProof'][0].filename : undefined;
 
-    console.log("this is the body", req.body)
 
   
     
@@ -121,7 +118,6 @@ exports.postUser = asyncHandler(async (req, res) => {
         })
         
         // Log the successful creation
-        console.log("New user created:", newUser, newPlanOrder);
 
         // Respond with success message and the created user
         res.status(200).json({
@@ -191,7 +187,6 @@ exports.createUser = asyncHandler(async (req, res) => {
         })
         
         // Log the successful creation
-        console.log("New user created:", newUser, newPlanOrder);
 
         // Respond with success message and the created user
         res.status(200).json({
@@ -213,8 +208,7 @@ exports.createUser = asyncHandler(async (req, res) => {
 
 
 exports.userPostSignIn = asyncHandler(async(req, res) => {
-    const { phone, password } = req.body;
-    console.log(req.body,"the body is here")
+    const { phone, password, fcmToken } = req.body;
     
     try {
         const postSignin = await userModel.findOne({ phone });
@@ -235,7 +229,7 @@ exports.userPostSignIn = asyncHandler(async(req, res) => {
         const token = jwt.sign({ email: postSignin.email }, "myjwtsecretkey");
 
         // Update the admin document in the database to save the token
-        await userModel.findByIdAndUpdate(postSignin._id, { token: token });
+        await userModel.findByIdAndUpdate(postSignin._id, { token: token, fcmToken:fcmToken });
 
         const userProfile = {
             id: postSignin._id,
@@ -256,10 +250,8 @@ exports.userPostSignIn = asyncHandler(async(req, res) => {
             idProof:postSignin.idProof,
             address:postSignin.address
         };
-        console.log(postSignin.image, " the image is ")
 
         res.status(200).json({ token: token, user: userProfile });
-        console.log(token,'the token is here')
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "Internal Server Error" });
@@ -357,7 +349,6 @@ exports.getUser = async (req, res) => {
 
 exports.getUserById = asyncHandler(async(req,res)=>{
     const {id} = req.params
-    // console.log(req.params, 'the id is here')
     try{
         const response = await userModel.findById(id)
         res.status(200).json(response)
@@ -432,7 +423,6 @@ exports.getrevealedUser = asyncHandler(async(req,res)=>{
     try{
        const user =  await userModel.find({revealed:true})
        res.send(user)
-       console.log(user,'the user is this')
     }catch(err){
         console.log(err)
     }
@@ -489,7 +479,6 @@ exports.getUserByPhone = asyncHandler(async (req, res) => {
 
 exports.forgotPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
-    console.log(email,'this is the mail')
 
     try {
         const user = await userModel.findOne({ email });
@@ -518,15 +507,25 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
             debug: true // Enable debugging
         });
 
-        const mailOptions = {
-            to: user.email,
-            from: process.env.EMAIL_USER,
-            subject: 'Password Reset Request',
-            text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
-            Please click on the following link, or paste this into your browser to complete the process:\n\n
-            https://fitnesshpclient.web.app/resetpassword/${token}\n\n
-            If you did not request this, please ignore this email and your password will remain unchanged.\n`
-        };
+       const mailOptions = {
+    to: user.email,
+    from: process.env.EMAIL_USER,
+    subject: 'Password Reset Request - FitnessHP',
+    text: `Dear ${user.name},
+
+    We received a request to reset your password for your FitnessHP account. If you made this request, please click on the link below or paste it into your browser to proceed with resetting your password:
+
+    https://fitnesshpclient.web.app/resetpassword/${token}
+
+    For security reasons, this link will expire in 30 minutes. If you didn’t request a password reset, please ignore this email—your password will remain unchanged.
+
+    Stay strong and keep pushing forward!
+
+    Best regards,
+    The FitnessHP Team
+    `
+};
+;
 
         await transporter.sendMail(mailOptions);
 

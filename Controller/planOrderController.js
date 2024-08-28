@@ -3,6 +3,44 @@ const plandOrderModel = require('../Model/plandOrderModel');
 const moment = require('moment'); // Import moment library for date manipulation
 const userModel = require('../Model/userModel')
 const notificationModel = require('../Model/notificationModal')
+const admin = require('firebase-admin');
+
+const serviceAccount = require('../config/firebaseServiceAccount.json');
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    projectId: process.env.PROJECT_ID,
+  });
+
+
+  const Notification = async(token, title, body)=>{
+    const registrationToken = token;
+    const message = {
+      token: registrationToken,
+      notification: {
+        title: title,
+        body: body,
+      },
+      android: {
+        priority: "high", // Set high priority for Android notifications
+      },
+      apns: {
+        payload: {
+          aps: {
+            "content-available": 1, // Ensure high priority for background notifications
+          },
+        },
+      },
+    };
+  
+    try {
+      const response = await admin.messaging().send(message);
+      response.status(200).send("Notification sent successfully");
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      response.status(500).send("Notification failed");
+    }
+  }
 
 // phonepay for testing purpose------------
 const PHONE_PAY_HOST_URL = 'https://api-preprod.phonepe.com/apis/pg-sandbox';
@@ -14,7 +52,6 @@ const SALT_KEY = '099eb0cd-02cf-4e2a-8aca-3e6c6aff0399'
 
 exports.postPlandOrder = asyncHandler(async(req,res)=>{
     const { userId, planId, name, amount, duration, userName, modeOfPayment } = req.body;
-    console.log(req.body), 'the rusult'
     try{
         // Calculate expiry date by adding duration months to the current date
         const expiryDate = moment().add(duration, 'days').toDate();
@@ -48,7 +85,6 @@ exports.spreadPlanForBuddy = asyncHandler(async(req,res)=>{
 
 exports.getPlanOrderByUser = asyncHandler(async (req, res) => {
     const { id: userId } = req.params;
-    console.log(userId, 'the id of the user');
     try {
         const userPlanOrders = await plandOrderModel.find({ userId });
 
@@ -66,7 +102,6 @@ exports.getPlanOrderByUser = asyncHandler(async (req, res) => {
             await planOrder.save(); // Save the updated plan order
         }
 
-        console.log(userPlanOrders, "the user's plan orders");
         
         // Send the user's plan orders with updated activeStatus to the frontend
         res.json(userPlanOrders);
@@ -78,7 +113,6 @@ exports.getPlanOrderByUser = asyncHandler(async (req, res) => {
 
 exports.getLastPlanOrderOfUser = asyncHandler(async (req, res) => {
     const { id: userId } = req.params;
-    console.log(userId, 'the id of the user');
     try {
         // Retrieve the last plan order for the user with activeStatus "Active" or "Nearly Expire"
         const lastPlanOrder = await plandOrderModel.findOne({userId})
@@ -104,7 +138,6 @@ exports.getLastPlanOrderOfUser = asyncHandler(async (req, res) => {
             lastPlanOrder.showUser = true
         }
         
-        console.log(lastPlanOrder, "the user's last plan order");
         
         // Send the last plan order with updated activeStatus to the frontend
         res.json(lastPlanOrder);
@@ -156,7 +189,6 @@ exports.getLastPlanOrderOfAllUsers = asyncHandler(async (req, res) => {
             }
         });
 
-        console.log(allUsersLastPlanOrders, "last plan orders of all users");
 
         // Send the last plan orders with updated activeStatus to the frontend
         res.json(allUsersLastPlanOrders);
@@ -182,7 +214,6 @@ exports.getPlanDetailsById = asyncHandler(async(req,res)=>{
 exports.updatePendingorderAmt = asyncHandler(async(req,res)=>{
     const {id} = req.params;
     const {amount} = req.body;
-    console.log(req.body,'the req body')
     try {
         const order = await plandOrderModel.findById(id)
         order.amount = amount
@@ -197,7 +228,6 @@ exports.updatePendingorderAmt = asyncHandler(async(req,res)=>{
 exports.updatePendingorderDate = asyncHandler(async(req,res)=>{
     const {id} = req.params;
     const {selectedAt} = req.body;
-    console.log(req.body,'the req body')
     try {
         const order = await plandOrderModel.findById(id)
         order.selectedAt = selectedAt
@@ -208,6 +238,50 @@ exports.updatePendingorderDate = asyncHandler(async(req,res)=>{
         res.status(500).send('An error occured while updating Date')
     }
 })
+
+
+exports.updateOrderDurationAndExpiry = asyncHandler(async (req, res) => {
+    try {
+        const { id } = req.params; // Extract id from params
+        const { duration } = req.body; // Extract duration (in days) from body
+
+        // Validate the input
+        if (!duration || isNaN(duration)) {
+            return res.status(400).json({ message: 'Invalid duration' });
+        }
+
+        // Calculate the new expiry date based on the duration in days
+        const expiryDate = moment().add(duration, 'days').toDate();
+
+        // Update the document
+        const updatedOrder = await plandOrderModel.findByIdAndUpdate(
+            id,
+            { 
+                duration, 
+                expiryDate 
+            },
+            { new: true } // Return the updated document
+        );
+
+        // Check if the document was found and updated
+        if (!updatedOrder) {
+            return res.status(404).json({ message: 'Plan order not found' });
+        }
+
+        // Send response
+        res.status(200).json({
+            message: 'Plan order updated successfully',
+            data: updatedOrder
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+
 
 exports.deletePlanOrder = asyncHandler(async(req,res)=>{
     const {id} = req.params
@@ -228,7 +302,6 @@ exports.postPendingOrder = asyncHandler(async(req,res)=>{
     try{
         // Calculate expiry date by adding duration months to the current date
         const expiryDate = moment().add(duration, 'days').toDate();
-        console.log(expiryDate,'this is the expiry date')
         // Create plan order with expiry date and activeStatus set to "Pending"
        const plandOrder =  await plandOrderModel.create({ 
             userId,
@@ -267,7 +340,6 @@ exports.getPendingPlanOrders = asyncHandler(async (req, res) => {
         });
         
         res.json(pendingPlanOrders);
-        console.log(pendingPlanOrders,'this is th pendsing plan')
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -282,7 +354,6 @@ exports.getBuddyPending = asyncHandler(async (req, res) => {
         });
         
         res.json(pendingPlanOrders);
-        console.log(pendingPlanOrders,'this is th pendsing plan')
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -351,6 +422,12 @@ exports.updateOrderToActive = asyncHandler(async(req,res)=>{
         // Save the updated order
         await order.save();
         await user.save();
+        const token = user.fcmToken;
+        if (token) {
+            await Notification(token, 'Order Acceptedt', 'Your order has been accepted.');
+        } else {
+            console.log('No FCM token available for the user');
+        }
 
         res.json({ message: 'Order updated to Active successfully' });
     } catch(err){
@@ -382,6 +459,12 @@ exports.updateOrderToRejected = asyncHandler(async(req,res)=>{
         await order.save();
         await user.save();
 
+       const token = user.fcmToken;
+        if (token) {
+            await Notification(token, 'Order Rejected', 'Your order has been rejected.');
+        } else {
+            console.log('No FCM token available for the user');
+        }
         res.json({ message: 'Order updated to Rejected successfully' });
     } catch(err){
         console.log(err);
@@ -393,7 +476,6 @@ exports.getAllStatus = asyncHandler(async(req,res)=>{
     try {
         const possibleStatuses = ["Active", "Expired", "Nearly Expire", "Pending", "Rejected"];
         res.status(200).json(possibleStatuses).send('All statuses fetched successfully');
-        console.log(possibleStatuses, 'All statuses');
     } catch (error) {
         console.log(error);
         res.status(500).send('An error occurred while fetching all statuses.');
@@ -442,7 +524,6 @@ exports.getActiveStatus = asyncHandler(async (req, res) => {
             }
         });
 
-        console.log(allUsersLastPlanOrders, "last plan orders of all users");
 
         // Filter to get only entries with activeStatus equal to "Active"
         const activeOrders = allUsersLastPlanOrders.filter(userOrder => userOrder.lastPlanOrder.activeStatus === "Active");
@@ -492,9 +573,6 @@ exports.updateBuddyPlan = asyncHandler(async (req, res) => {
     const { id } = req.params;
 const planMembersCount = buddyPlanMembers.length + 1;
 const splitAmount = amount / planMembersCount;
-console.log(planMembersCount,'this is the members count')
-console.log(amount,'this is the members amount')
-console.log(splitAmount,'this is the split amount')
 
     try {
         // Find the existing plan order by its ID
@@ -570,3 +648,77 @@ exports.monthlyReport = asyncHandler(async(req,res)=>{
         res.status(500).json({ message: err.message });
     }
 })
+
+// pause the plan --------
+exports.pausePlan = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const planOrder = await plandOrderModel.findById(id);
+
+        if (!planOrder) {
+            return res.status(404).json({ error: 'Plan order not found' });
+        }
+
+        if (planOrder.activeStatus === 'Paused') {
+            return res.status(400).json({ message: 'Plan is already paused' });
+        }
+
+        // Calculate remaining days
+        const currentDate = moment();
+        const expiryDate = moment(planOrder.expiryDate);
+        const remainingDays = expiryDate.diff(currentDate, 'days');
+
+        // Pause the plan
+        planOrder.activeStatus = 'Paused';
+        planOrder.pauseDate = currentDate.toDate(); // Record pause date
+        planOrder.remainingDays = remainingDays; // Store remaining days
+        planOrder.showUser = false
+
+        // Remove expiryDate or set to a placeholder
+        planOrder.expiryDate = null;
+
+        await planOrder.save();
+
+        res.json({ message: 'Plan paused successfully', planOrder });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// un puase the plan -----
+exports.unpausePlan = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const planOrder = await plandOrderModel.findById(id);
+
+        if (!planOrder) {
+            return res.status(404).json({ error: 'Plan order not found' });
+        }
+
+        if (planOrder.activeStatus !== 'Paused') {
+            return res.status(400).json({ message: 'Plan is not paused' });
+        }
+
+        // Calculate new expiry date
+        const currentDate = moment();
+        const expiryDate = moment(currentDate).add(planOrder.remainingDays, 'days');
+
+        // Unpause the plan
+        planOrder.activeStatus = 'Active';
+        planOrder.expiryDate = expiryDate.toDate(); // Restore expiry date
+        planOrder.pauseDate = null; // Clear pause date
+        planOrder.remainingDays = null; // Clear remaining days
+        planOrder.showUser = true
+
+        await planOrder.save();
+
+        res.json({ message: 'Plan unpaused successfully', planOrder });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
