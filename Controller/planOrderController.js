@@ -27,17 +27,21 @@ const Notification = async (token, title, body) => {
       body: body,
     },
     android: {
-      priority: "high", // Set high priority for Android notifications
+      notification: {
+        priority: "high",
+        sound: "default",
+      },
     },
     apns: {
       payload: {
         aps: {
-          "content-available": 1, // Ensure high priority for background notifications
+          contentAvailable: true,
+          sound: "default",
         },
       },
     },
   };
-
+  
   try {
     const response = await admin.messaging().send(message);
     console.log("Notification sent successfully");
