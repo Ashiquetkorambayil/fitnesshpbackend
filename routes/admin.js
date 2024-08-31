@@ -96,6 +96,8 @@ router.put('/unreveal/:id',verifyToken,userController.unrevealUser);
 router.post('/onlineuser', upload.fields([{ name: 'image', maxCount: 1 },{ name: 'idproof', maxCount: 1 }]),userController.onlineUser);
 router.put('/changepassword/:id',verifyToken,userController.changepassword);
 router.get('/getuserbyphone/:phone',verifyToken,userController.getUserByPhone);
+router.get('/getpendingusers',verifyToken,userController.getUsersCreatedByStaff)
+router.put('/activateuser/:id',verifyToken,userController.updateUserCreatedByStaff)
 // plan orders ----------------
 
 router.post('/createplanorder',verifyToken,planOrderController.postPlandOrder)

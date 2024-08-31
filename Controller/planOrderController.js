@@ -12,8 +12,8 @@ admin.initializeApp({
     projectId: process.env.PROJECT_ID,
   });
 
-
-  const Notification = async(token, title, body)=>{
+  
+  const Notification = async (token, title, body) => {
     const registrationToken = token;
     const message = {
       token: registrationToken,
@@ -35,13 +35,12 @@ admin.initializeApp({
   
     try {
       const response = await admin.messaging().send(message);
-      response.status(200).send("Notification sent successfully");
+      console.log("Notification sent successfully");
     } catch (error) {
       console.error("Error sending notification:", error);
-      response.status(500).send("Notification failed");
     }
   }
-
+  
 // phonepay for testing purpose------------
 const PHONE_PAY_HOST_URL = 'https://api-preprod.phonepe.com/apis/pg-sandbox';
 const MERCHANT_ID ='PGTESTPAYUAT';
@@ -422,6 +421,7 @@ exports.updateOrderToActive = asyncHandler(async(req,res)=>{
         // Save the updated order
         await order.save();
         await user.save();
+
         const token = user.fcmToken;
         if (token) {
             await Notification(token, 'Order Acceptedt', 'Your order has been accepted.');

@@ -2,15 +2,16 @@ const planModel = require('../Model/planModel');
 const asyncHandler = require('express-async-handler');
 
 exports.postPlan = asyncHandler(async(req, res)=>{
-    const {hour, amount, duration, description, category} = req.body
-    
+    const {hour, amount, duration, description, category, notes} = req.body
+    console.log(req.body)
     try{
         await planModel.create({
             hour:hour,
             amount:amount,
             duration:duration,
             description:description,
-            category:category
+            category:category,
+            notes:notes
         })
         res.status(200).send('plans posted successfully')
     }catch(err){
@@ -58,7 +59,7 @@ exports.getPlansByOptions = asyncHandler(async(req,res)=>{
 
 exports.putPlans = asyncHandler(async(req, res)=>{
     const {id} = req.params;
-    const {hour, amount, duration, description, category} = req.body;
+    const {hour, amount, duration, description, category, notes} = req.body;
    
    
 
@@ -69,7 +70,8 @@ exports.putPlans = asyncHandler(async(req, res)=>{
            amount:amount,
            duration:duration,
            description:description,
-           category:category
+           category:category,
+           notes:notes
         }
         const updateData = await planModel.findByIdAndUpdate(id, {$set:update}, {new:true})
         res.status(200).json(updateData)

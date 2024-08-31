@@ -65,16 +65,13 @@ exports.onlineUser = asyncHandler(async (req, res) => {
 
 
 exports.postUser = asyncHandler(async (req, res) => {
-    const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration, address, dateOfJoining} = req.body; 
+    const { name, phone, password, height, weight, dateOfBirth, blood, email, modeOfPayment, planId, planName, amount, duration, address, dateOfJoining } = req.body; 
     const image = req.files['image'] ? req.files['image'][0].filename : undefined;
     const idProof = req.files['idProof'] ? req.files['idProof'][0].filename : undefined;
 
-
-  
-    
     try {
         // Validate inputs
-        if ( !phone || !password) {
+        if (!phone || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
         
@@ -83,11 +80,14 @@ exports.postUser = asyncHandler(async (req, res) => {
         if (existingUser) {
             return res.status(409).json({ message: "Phone number already exists" });
         }
-        // const expiryDate = moment().add(duration, 'months').toDate();
-         const expiryDate = moment(dateOfJoining).add(duration, 'days').toDate();
-
         
-        // Create the user
+        const expiryDate = moment(dateOfJoining).add(duration, 'days').toDate();
+
+        // Determine if the request is from a staff member
+        const isStaff = req.headers["x-user-type"] === "staff";
+        console.log(isStaff, 'this is the staff');
+
+        // Create the user with createdByStaff set to true only if a staff member created the user
         const newUser = await userModel.create({
             image,
             name,
@@ -98,11 +98,14 @@ exports.postUser = asyncHandler(async (req, res) => {
             dateOfBirth,
             blood,
             email,
-            idProof:idProof,
+            idProof: idProof,
             address,
             authenticate: true,
-            createdAt:dateOfJoining
+            createdAt: dateOfJoining,
+            createdByStaff: isStaff // Set to true if created by staff
         });
+
+        // Create the plan order
         const newPlanOrder = await plandOrderModel.create({
             userId: newUser._id,
             plandId: planId,
@@ -112,12 +115,10 @@ exports.postUser = asyncHandler(async (req, res) => {
             expiryDate: expiryDate,
             modeOfPayment: modeOfPayment,
             userName: name,
-            activeStatus:'Active',
-            showUser:true,
-            selectedAt:dateOfJoining
-        })
-        
-        // Log the successful creation
+            activeStatus: 'Active',
+            showUser: true,
+            selectedAt: dateOfJoining
+        });
 
         // Respond with success message and the created user
         res.status(200).json({
@@ -133,6 +134,28 @@ exports.postUser = asyncHandler(async (req, res) => {
         res.status(500).json({ message: 'An error occurred while posting user' });
     }
 });
+
+exports.updateUserCreatedByStaff = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Find the user by ID
+        const user = await userModel.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update createdByStaff to false
+        user.createdByStaff = false;
+        await user.save();
+
+        res.status(200).json({ message: 'User updated successfully', user });
+    } catch (err) {
+        console.error('Error updating user:', err);
+        res.status(500).json({ message: 'An error occurred while updating user' });
+    }
+});
+
 
 
 exports.createUser = asyncHandler(async (req, res) => {
@@ -204,12 +227,22 @@ exports.createUser = asyncHandler(async (req, res) => {
 });
 
 
+exports.getUsersCreatedByStaff = asyncHandler(async (req, res) => {
+    try {
+        // Find all users where createdByStaff is true
+        const users = await userModel.find({ createdByStaff: true });
+        // Return the list of users
+        res.status(200).json({ users });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 
 
-
-exports.userPostSignIn = asyncHandler(async(req, res) => {
+exports.userPostSignIn = asyncHandler(async (req, res) => {
     const { phone, password, fcmToken } = req.body;
-    
+
     try {
         const postSignin = await userModel.findOne({ phone });
 
@@ -217,9 +250,15 @@ exports.userPostSignIn = asyncHandler(async(req, res) => {
             return res.status(400).json({ error: "Invalid phone number or password" });
         }
 
+        // Check if the user was created by a staff member
+        if (postSignin.createdByStaff) {
+            return res.status(405).json({ error: "User account is not authorized for sign-in" });
+        }
+
         if (!postSignin.authenticate) {
             return res.status(403).json({ error: "User is not authenticated" });
         }
+
         const isPasswordMatch = await bcrypt.compare(password, postSignin.password);
 
         if (!isPasswordMatch) {
@@ -228,8 +267,8 @@ exports.userPostSignIn = asyncHandler(async(req, res) => {
 
         const token = jwt.sign({ email: postSignin.email }, "myjwtsecretkey");
 
-        // Update the admin document in the database to save the token
-        await userModel.findByIdAndUpdate(postSignin._id, { token: token, fcmToken:fcmToken });
+        // Update the user document in the database to save the token
+        await userModel.findByIdAndUpdate(postSignin._id, { token: token, fcmToken: fcmToken });
 
         const userProfile = {
             id: postSignin._id,
@@ -247,16 +286,17 @@ exports.userPostSignIn = asyncHandler(async(req, res) => {
             duration: postSignin.duration,
             expiryDate: postSignin.expiryDate,
             activeStatus: postSignin.activeStatus,
-            idProof:postSignin.idProof,
-            address:postSignin.address
+            idProof: postSignin.idProof,
+            address: postSignin.address,
         };
 
-        res.status(200).json({ token: token, user: userProfile });
+        res.status(200).json({ token: token, user: userProfile, fcmToken: fcmToken });
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
 
 exports.getAllUsers = asyncHandler(async(req,res)=>{
     try {
@@ -384,15 +424,41 @@ exports.editUser = asyncHandler(async(req, res)=>{
     }
 })
 
-exports.deleteUser = asyncHandler(async(req, res)=>{
-    const {id} = req.params
-    try{
-        const response = await userModel.findByIdAndDelete(id)
-        res.status(200).json(response)
-    }catch(err){
-        console.log(err)
+exports.deleteUser = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Check if the user exists
+        const user = await userModel.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check if the user has any active or pending plans
+        const userPlans = await plandOrderModel.find({
+            userId: id,
+            activeStatus: { $in: ['Pending'] }
+        });
+
+        if (userPlans.length > 0) {
+            return res.status(400).json({
+                message: 'User cannot be deleted because they have pending plans',
+                plans: userPlans
+            });
+        }
+
+        // If the user has no active or pending plans, proceed with deletion
+        const deletedUser = await userModel.findByIdAndDelete(id);
+
+        res.status(200).json({
+            message: 'User deleted successfully',
+            user: deletedUser
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'An error occurred while deleting the user', error: err.message });
     }
-})
+});
 
 exports.revealUser = asyncHandler(async(req,res)=>{
     const {id} = req.params
