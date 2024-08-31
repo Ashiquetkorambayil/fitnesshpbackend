@@ -45,7 +45,7 @@ const campaignController = require('../Controller/campaignController')
 const notificationController = require('../Controller/notificationController')
 const subCategoryController = require('../Controller/subCategoryController')
 const staffController = require('../Controller/staffController')
-const notification = require('../Controller/firebaseNotification')
+// const notification = require('../Controller/firebaseNotification')
 
 
 // admin -----------------------------
@@ -173,7 +173,7 @@ router.get('/staffsget', staffController.getStaff);
 router.get('/staffgetbyid/:id', staffController.getStaffById);
 
 // notification --------------------
-router.post('/notify',notification.Notification)
+// router.post('/notify',notification.Notification)
 
 
 module.exports = router;
