@@ -5,7 +5,12 @@ const userModel = require('../Model/userModel')
 const notificationModel = require('../Model/notificationModal')
 const admin = require('firebase-admin');
 
-const serviceAccount = require('../config/firebaseServiceAccount.json');
+require('dotenv').config();
+if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    throw new Error('GOOGLE_APPLICATION_CREDENTIALS environment variable is not set');
+  }
+  
+  const serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -13,34 +18,34 @@ admin.initializeApp({
   });
 
   
-  const Notification = async (token, title, body) => {
-    const registrationToken = token;
-    const message = {
-      token: registrationToken,
-      notification: {
-        title: title,
-        body: body,
-      },
-      android: {
-        priority: "high", // Set high priority for Android notifications
-      },
-      apns: {
-        payload: {
-          aps: {
-            "content-available": 1, // Ensure high priority for background notifications
-          },
+const Notification = async (token, title, body) => {
+  const registrationToken = token;
+  const message = {
+    token: registrationToken,
+    notification: {
+      title: title,
+      body: body,
+    },
+    android: {
+      priority: "high", // Set high priority for Android notifications
+    },
+    apns: {
+      payload: {
+        aps: {
+          "content-available": 1, // Ensure high priority for background notifications
         },
       },
-    };
-  
-    try {
-      const response = await admin.messaging().send(message);
-      console.log("Notification sent successfully");
-    } catch (error) {
-      console.error("Error sending notification:", error);
-    }
+    },
+  };
+
+  try {
+    const response = await admin.messaging().send(message);
+    console.log("Notification sent successfully");
+  } catch (error) {
+    console.error("Error sending notification:", error);
   }
-  
+}
+
 // phonepay for testing purpose------------
 const PHONE_PAY_HOST_URL = 'https://api-preprod.phonepe.com/apis/pg-sandbox';
 const MERCHANT_ID ='PGTESTPAYUAT';
