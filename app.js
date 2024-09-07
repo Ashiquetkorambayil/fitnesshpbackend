@@ -20,8 +20,28 @@ const app = express();
 
 connectDB(); // Connect to MongoDB
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://app.fitnesshptvm.com',
+  'https://admin.fitnesshptvm.com'
+];
+
+// app.use(cors({
+//   origin: '*'
+// }));
+
 app.use(cors({
-  origin: '*'
+  origin: function (origin, callback) {
+    // Allow requests with no origin (e.g., mobile apps, curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
 }));
 
 
