@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const planModel = new mongoose.Schema({
-    hour:{type:String, required:true},
+    name:{type:String,},
+    hour:{type:String},
     amount:{type:Number, required:true},
     duration:{type:Number, required:true},
     notes:[{type:String}],
