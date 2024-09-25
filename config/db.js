@@ -13,6 +13,3 @@ const connectDB = async () => {
 
 module.exports = connectDB;
 
- // 'mongodb://localhost:27017'
- 
-//  mongodb+srv://ashiquetk860628:lomKLxmyRFyEc2SG@gymadmin.gmvkych.mongodb.net/?retryWrites=true&w=majority&appName=gymadmin
