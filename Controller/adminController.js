@@ -25,43 +25,6 @@ exports.postadmin = asyncHandler(async(req, res)=>{
     }
 })
 
-// exports.postsignin = asyncHandler(async(req, res) => {
-//     const { email, password } = req.body;
-    
-//     try {
-//         const postSignin = await adminModel.findOne({ email });
-
-//         if (!postSignin) {
-//             return res.status(400).json({ error: "Invalid email or password" });
-//         }
-
-//         const isPasswordMatch = await bcrypt.compare(password, postSignin.password);
-
-//         if (!isPasswordMatch) {
-//             return res.status(400).json({ error: "Invalid email or password" });
-//         }
-
-//         const token = jwt.sign({ email: postSignin.email }, "myjwtsecretkey");
-
-//         // Update the admin document in the database to save the token
-//         await adminModel.findByIdAndUpdate(postSignin._id, { token: token });
-
-//         const userProfile = {
-//             id: postSignin._id,
-//             name: postSignin.name,
-//             email: postSignin.email,
-//             role: postSignin.role,
-//             phone: postSignin.phone,
-//             image: postSignin.image,
-//         };
-
-//         res.status(200).json({ token: token, admin: userProfile });
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({ error: "Internal Server Error" });
-//     }
-// });
-
 
 
 exports.postsignin = asyncHandler(async (req, res) => {
