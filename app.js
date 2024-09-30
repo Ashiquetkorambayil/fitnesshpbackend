@@ -26,7 +26,6 @@ connectDB(); // Connect to MongoDB
 //   'https://app.fitnesshptvm.com',
 //   'https://admin.fitnesshptvm.com'
 // ];
-
 app.use(
   cors({
     origin: [
@@ -35,8 +34,10 @@ app.use(
       "https://app.fitnesshptvm.com",
       "https://admin.fitnesshptvm.com",
     ],
+    credentials: true, // Allow credentials
   })
 );
+
 
 // app.use(cors({
 //   origin: function (origin, callback) {
