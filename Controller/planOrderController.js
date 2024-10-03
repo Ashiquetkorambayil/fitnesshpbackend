@@ -68,6 +68,7 @@ exports.postPlandOrder = asyncHandler(async(req,res)=>{
         await plandOrderModel.create({ userId, planId, name, amount, duration, expiryDate ,modeOfPayment, userName, activeStatus:'Active',showUser:true});
         const user = await userModel.findById(userId);
         user.authenticate = true
+        user.createdAt = Date.now()
         await user.save();
 
         res.json({ message: 'User plan selected successfully' });
@@ -426,6 +427,7 @@ exports.updateOrderToActive = asyncHandler(async(req,res)=>{
         order.show = false;
         order.showUser = true;
         user.authenticate = true
+        user.createdAt = Date.now()
 
         // Save the updated order
         await order.save();
